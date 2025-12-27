@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Dual.Infodose v5.0 · KOBLLUX INTEGRATED</title>
+
+  <meta name="theme-color" content="#050811" />
+  <link rel="manifest" href="./manifest.webmanifest">
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Highlight.js (syntax highlight) -->
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/build/highlight.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/styles/github-dark.min.css" id="hljs-theme">
+  <script>hljs.highlightAll();</script>
+
+  
+  <style>
+    /* =========================
+       SOLAR NEBULA PRO — CORE CSS (BLINDADO)
+    ========================= */
+    :root {
+      --bg-deep: #050811; 
+      
+      /* Gradientes Solares */
+      --bg-day: radial-gradient(circle at 30% 20%, #ffffff 0%, #f2f8ff 18%, #d0e9ff 40%, #9ed0ff 65%, #6bb9ff 85%, #59a8ff 100%);
+      --bg-sunset: linear-gradient(180deg, #fbcfe8 0%, #fb923c 20%, #4c1d95 60%, #111827 100%);
+      --bg-night: radial-gradient(circle at 20% 0%, #0b1020 0%, #121c3b 40%, #1a237e 80%, #000000 100%);
+
+      /* UI Tokens */
+      --bg-panel: rgba(10, 14, 24, 0.95);
+      --primary: #00f5ff;
+      --secondary: #ff4bff;
+      --text-main: #e4ecff;
+      --text-muted: #9aa4c8;
+      --danger: #ff4b6b;
+      
+      --glass: blur(20px) saturate(180%);
+      --border-light: 1px solid rgba(255, 255, 255, 0.1);
+      
+      --radius-lg: 24px;
+      --radius-md: 12px;
+    }
+
+    /* Reset & Base */
+    html, body {
+        margin: 0; padding: 0;
+        width: 100%; height: 100%;
+        background-color: var(--bg-deep);
+        background: var(--bg-deep);
+        color: var(--text-main);
+        font-family: "Montserrat", sans-serif;
+        overflow: hidden;
+        transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body.mode-day { background: var(--bg-day) !important; color: #1a1a1a !important; }
+    body.mode-sunset { background: var(--bg-sunset) !important; color: #fff !important; }
+    body.mode-night { background: var(--bg-night) !important; color: var(--text-main) !important; }
+
+    /* Adaptação de UI Interna */
+    body.mode-day .msg-block.ai { background: rgba(0,0,0,0.05); color: #222; border-color: rgba(0,0,0,0.1); }
+    body.mode-day .glass-input { background: rgba(255,255,255,0.8); color: #000; border-color: #ccc; }
+    body.mode-day .btn-icon { color: #333; border-color: rgba(0,0,0,0.2); }
+    body.mode-day .cockpit-item { background: rgba(0,0,0,0.05); color: #000; }
+    body.mode-day .cockpit-input { color: #000; border-bottom-color: rgba(0,0,0,0.3); }
+    
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    /* --- CAMADAS DE FUNDO --- */
+    .sky-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .sun-background {
+      position: absolute; width: 300px; height: 300px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fffde7 0%, #fff176 40%, #ffb300 100%);
+      filter: blur(60px); opacity: 0; transition: opacity 2s;
+      animation: sun-orbit 60s linear infinite;
+    }
+    body.mode-day .sun-background { opacity: 0.5; }
+    
+    @keyframes sun-orbit {
+      0% { transform: translate(-20vw, 10vh); }
+      50% { transform: translate(80vw, -10vh); }
+      100% { transform: translate(-20vw, 10vh); }
+    }
+
+    #particles-js { position: fixed; inset: 0; z-index: 1; opacity: 0.3; pointer-events: none; transition: opacity 0.6s ease; }
+    body.mode-day #particles-js { opacity: 0.1; }
+    
+    #bg-fake-custom { position: fixed; inset: 0; z-index: 2; opacity: 0.2; background-size: cover; background-position: center; pointer-events: none; }
+
+    /* --- HEADER / ORB --- */
+    .header-orb {
+      position: fixed; top: 40px; left: 50%; transform: translateX(-50%);
+      width: 70px; height: 70px; z-index: 15;
+      animation: floatOrb 6s ease-in-out infinite;
+      cursor: pointer; transition: all 0.5s ease;
+    }
+    .header-orb svg { width: 100%; height: 100%; transition: fill 0.5s ease; filter: drop-shadow(0 0 10px rgba(0,245,255,0.5)); }
+
+    body.mode-day .header-orb svg { fill: #fff176; filter: drop-shadow(0 0 20px #ffb300); }
+    body.mode-sunset .header-orb svg { fill: #ffb74d; filter: drop-shadow(0 0 30px #e65100); }
+    body.mode-night .header-orb svg { fill: white; filter: drop-shadow(0 0 15px var(--primary)); }
+
+    @keyframes floatOrb { 0%,100%{transform:translate(-50%,0)} 50%{transform:translate(-50%,-8px)} }
+    
+    #usernameDisplay {
+        position: fixed; top: 120px; left: 50%; 
+        transform: translateX(-50%); z-index: 10;
+        font-size: 0.75rem; color: var(--text-muted);
+        opacity: 0.6; pointer-events: none;
+        text-transform: uppercase; letter-spacing: 2px;
+    }
+
+    /* Toast */
+    #nv-toast {
+      position: fixed; bottom: 200px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px; border-radius: 50px;
+      backdrop-filter: blur(10px); opacity: 0; transition: 0.4s; z-index: 9999;
+      font-size: 0.8rem; pointer-events: none; border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    #nv-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    
+    #modeIndicator {
+      position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+      font-size: 0.65rem; font-weight: bold; opacity: 0.5; z-index: 20; 
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    /* --- CHAT AREA --- */
+    .top-bar { position: fixed; top: 0; left: 0; right: 0; padding: 15px; display: flex; justify-content: space-between; z-index: 20; pointer-events: none; }
+    .top-grp { display: flex; gap: 10px; pointer-events: auto; }
+
+    #chat-container { 
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        padding: 140px 16px 100px 16px; z-index: 5; 
+        overflow-y: auto; display: flex; flex-direction: column; gap: 16px; 
+        transition: opacity 0.4s ease; scroll-behavior: smooth;
+    }
+    #chat-container.collapsed { opacity: 0; pointer-events: none; }
+
+    /* Mensagens */
+    .msg-block { max-width: 88%; padding: 12px 16px; border-radius: 12px; position: relative; animation: slideIn 0.3s ease-out; line-height: 1.5; font-size: 0.95rem; word-wrap: break-word; }
+    .msg-block.user { align-self: flex-end; background: rgba(0,245,255,0.08); border-right: 2px solid var(--primary); text-align: right; }
+    .msg-block.ai { align-self: flex-start; background: rgba(255,255,255,0.05); border-left: 2px solid var(--secondary); }
+    .msg-block.system { align-self: center; font-size: 0.75rem; opacity: 0.8; text-align: center; border: 1px dashed rgba(255,255,255,0.2); background: transparent; padding: 6px 12px; font-style: italic; }
+    
+    /* Code Blocks Customization */
+    pre { position: relative; background: rgba(0,0,0,0.4); border-radius: 8px; margin: 10px 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+    code { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+    .copy-code-btn {
+        position: absolute; top: 8px; right: 8px;
+        background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+        color: var(--primary); font-size: 0.7rem; padding: 4px 8px; border-radius: 4px;
+        cursor: pointer; z-index: 10; opacity: 0.7; transition: 0.2s;
+    }
+    .copy-code-btn:hover { opacity: 1; background: var(--primary); color: #000; }
+
+    @keyframes slideIn { from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
+
+    .msg-tools { display: flex; gap: 10px; justify-content: flex-end; margin-top: 5px; opacity: 0.5; }
+    .msg-block.ai .msg-tools { justify-content: flex-start; }
+    .tool-btn { background: none; border: none; color: inherit; padding: 0; cursor: pointer; }
+    .tool-btn:hover { color: var(--primary); opacity: 1; }
+    .tool-btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+    /* --- INPUT AREA --- */
+    .input-dock { position: fixed; bottom: 0; left: 0; right: 0; padding: 16px; background: linear-gradient(to top, var(--bg-deep) 30%, transparent); z-index: 30; display: flex; flex-direction: column; align-items: center; }
+    body.mode-day .input-dock { background: linear-gradient(to top, rgba(255,255,255,0.8) 30%, transparent); }
+
+    /* File Preview */
+    #filePreview {
+        display: none; width: 100%; max-width: 400px; background: rgba(0,0,0,0.8);
+        border: 1px solid var(--primary); border-radius: 12px; padding: 10px;
+        margin-bottom: 10px; align-items: center; justify-content: space-between;
+        backdrop-filter: blur(10px);
+    }
+    #filePreview.active { display: flex; animation: slideIn 0.3s; }
+    .file-info { font-size: 0.8rem; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+    .file-actions { display: flex; gap: 10px; }
+    .btn-preview { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; }
+    .btn-preview.primary { background: var(--primary); color: #000; }
+
+    #field-toggle-handle { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; opacity: 0.9; cursor: pointer; padding-bottom: 12px; text-transform: lowercase; letter-spacing: 1px; transition: 0.3s; }
+    #field-toggle-handle:hover { color: var(--primary); transform: scale(1.02); }
+    .footer-dot{ width:8px; height:8px; border-radius:50%; background:var(--secondary); animation:pulse 2s infinite; }
+    @keyframes pulse{50%{opacity:.4; box-shadow: 0 0 10px currentColor;}}
+    
+    .input-row { display: flex; width: 100%; gap: 10px; align-items: center; max-width: 800px; }
+    .glass-input { flex: 1; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); color: inherit; padding: 14px 20px; border-radius: 99px; outline: none; transition: 0.3s; }
+    .glass-input:focus { background: rgba(0,0,0,0.5); border-color: var(--primary); box-shadow: 0 0 15px rgba(0,245,255,0.2); }
+    body.mode-day .glass-input:focus { background: white; }
+
+    /* --- BOTÕES --- */
+    .btn-icon { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: inherit; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; backdrop-filter: blur(5px); }
+    .btn-icon:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); border-color: var(--primary); }
+    .btn-icon svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; }
+    
+    .btn-primary { background: var(--primary); color: #000 !important; border: none; box-shadow: 0 0 10px rgba(0, 245, 255, 0.4); }
+    #btnVoice.listening { background: var(--danger); box-shadow: 0 0 15px var(--danger); animation: pulse 1s infinite; color: white !important; }
+
+    /* --- GAVETAS (DRAWERS) --- */
+    .drawer { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; display: flex; align-items: center; justify-content: center; }
+    .drawer.open { opacity: 1; pointer-events: auto; }
+    
+    .drawer-content { width: 90%; max-width: 450px; max-height: 85vh; background: var(--bg-panel); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    body.mode-day .drawer-content { background: #fff; color: #222; }
+
+    .drawer.open .drawer-content { transform: scale(1); }
+    
+    .drawer-header { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); }
+    body.mode-day .drawer-header { border-bottom-color: rgba(0,0,0,0.1); }
+    
+    .drawer-header h3 { margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+    .drawer-body { padding: 20px; overflow-y: auto; flex: 1; }
+
+    /* COCKPIT EDITÁVEL */
+    .cockpit-grid { display: flex; flex-direction: column; gap: 15px; }
+    .cockpit-item { background: rgba(255,255,255,0.03); padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; }
+    .cockpit-label { font-size: 0.7rem; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+    body.mode-day .cockpit-label { color: #007bff; }
+    
+    .cockpit-input { background: transparent; border: none; color: white; font-family: 'JetBrains Mono', monospace; font-size: 1rem; outline: none; width: 100%; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px; transition: 0.3s; }
+    .cockpit-input:focus { border-bottom-color: var(--secondary); }
+
+    .control-row { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-block { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: inherit; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: 0.2s; }
+    body.mode-day .btn-block { background: #f0f0f0; border-color: #ddd; }
+    
+    .btn-block:hover { background: rgba(255,255,255,0.15); border-color: var(--primary); }
+    .btn-block.active { background: var(--primary); color: #000; border-color: var(--primary); }
+
+    /* Deck Items */
+    .deck-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+    body.mode-day .deck-item { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
+    .deck-info h4 { margin: 0 0 5px 0; font-size: 0.9rem; }
+    .deck-info span { font-size: 0.7rem; opacity: 0.7; }
+
+    /* Utility */
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-size: 0.8rem; color: var(--text-muted); }
+    .glass-textarea { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2); color: inherit; padding: 10px; border-radius: 8px; min-height: 80px; }
+    body.mode-day .glass-textarea { background: rgba(255,255,255,0.8); color: #000; border-color: #ccc; }
+
+    .edit-save-btn { background: var(--primary); color: #000; border: none; padding: 5px 10px; border-radius: 5px; margin-top: 5px; cursor: pointer; font-weight: bold; }
+    
+    /* Preview HTML */
+    .preview-html {
+        width: 100%; height: 300px; border: 1px solid rgba(255,255,255,0.2);
+        background: #000; border-radius: 10px; overflow: hidden;
+    }
+    .preview-html iframe {
+        width: 100%; height: 100%; border: none; display: block;
+    }
+    
+    /* Preview Code */
+    .preview-code {
+        width: 100%; max-height: 250px; overflow: auto; border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 10px; background: rgba(0,0,0,0.4);
+    }
+    .preview-code pre {
+        margin: 0; background: transparent; border: none; padding: 10px;
+    }
+    .preview-code pre code {
+        display: block; padding: 10px;
+    }
+    
+    /* Download Button */
+    .download-btn {
+        display: inline-flex; align-items: center; gap: 5px;
+        background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+        color: var(--primary); font-size: 0.75rem; padding: 6px 10px; border-radius: 6px;
+        cursor: pointer; transition: 0.2s; margin-top: 5px;
+    }
+    .download-btn:hover { background: var(--primary); color: #000; }
+    
+    /* File Message */
+    .msg-block.file-msg {
+        background: rgba(255,255,255,0.05); border-left: 3px solid var(--secondary);
+    }
+    .file-header {
+        display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+    }
+    .file-meta { font-size: 0.75rem; color: var(--text-muted); }
+
+  </style>
+  <style id="custom-styles"></style>
+    
+</head>
+
+<body class="field-closed mode-day">
+
+  <svg style="display:none">
+    <symbol id="icon-orb" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="8"/></symbol>
+    <symbol id="icon-cards" viewBox="0 0 24 24"><rect x="2" y="2" width="16" height="16" rx="2"/><path d="M22 6v14a2 2 0 0 1-2 2H6"/></symbol>
+    <symbol id="icon-gem" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="icon-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+    <symbol id="icon-mic" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></symbol>
+    <symbol id="icon-voice" viewBox="0 0 24 24"><rect x="9" y="1" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></symbol>
+    <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+    <symbol id="icon-restore" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></symbol>
+    <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></symbol>
+  </svg>
+    
+  <div class="sky-layer">
+    <div class="sun-background"></div>
+  </div>
+  
+  <div id="particles-js"></div>
+  <div id="bg-fake-custom"></div> 
+  <div id="nv-toast"></div>
+  <div id="modeIndicator">CARREGANDO nO.Sºlar...</div>
+
+  <div class="header-orb" id="orbToggle" title="Acessar Cockpit do Usuário">
+    <svg><use href="#icon-orb"></use></svg>
+  </div>
+  <div id="usernameDisplay"></div>
+
+  <div class="top-bar">
+    <div class="top-grp">
+      <button class="btn-icon" id="btnSettings" title="Configurações Avançadas">
+        <svg><use href="#icon-settings"></use></svg>
+      </button>
+    </div>
+    <div class="top-grp">
+      <button class="btn-icon" id="btnDeck" title="Deck de Memória">
+        <svg><use href="#icon-cards"></use></svg>
+      </button>
+      <button class="btn-icon" id="btnCrystallize" title="Cristalizar (Salvar)">
+        <svg><use href="#icon-gem"></use></svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="chat-container" class="collapsed">
+    <div class="msg-block system">
+      Dual.Infodose v5.0<br>Sistemas re-alinhados.<br>Upload Ativo & Code Copy Pronto.
+    </div>
+  </div>
+
+  <div class="input-dock">
+    
+    <div id="filePreview" class="file-preview">
+       <div class="file-info"><span></span></div>
+       <div class="file-actions"></div>
+    </div>
+    <input type="file" id="fileUploadInput" accept="image/*,.pdf,.txt,.json,.js,.css,.html" style="display:none;">
+
+    <div id="field-toggle-handle">
+        <span class="footer-dot"></span>
+        tocar o campo é consentir
+    </div>
+
+    <div class="input-row">
+        <button class="btn-icon" id="btnVoice" title="Voz">
+            <svg><use href="#icon-voice"></use></svg>
+       </button>
+        <button class="btn-icon" id="btnUploadFile" title="Enviar Arquivo">
+            <svg><use href="#icon-upload"></use></svg>
+       </button>
+
+        <input type="text" id="userInput" class="glass-input" placeholder="Emitir pulso..." autocomplete="off">
+        
+        <button class="btn-icon btn-primary" id="btnSend" title="Enviar">
+          <svg><use href="#icon-send"></use></svg>
+        </button>
+    </div>
+  </div>
+
+  <div id="drawerSettings" class="drawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <h3>Configuração Neural</h3>
+        <button class="btn-icon" style="width:30px;height:30px" onclick="toggleDrawer('drawerSettings')">✕</button>
+      </div>
+      <div class="drawer-body">
+        <div class="form-group">
+          <label>Chave Dual (API Key)</label>
+          <input type="password" id="apiKeyInput" class="glass-input" style="border-radius:8px; width:100%" placeholder="sk-..." />
+        </div>
+        <div class="form-group">
+            <label>Dual (Prompt)</label>
+            <textarea id="systemRoleInput" class="glass-textarea" placeholder="Você é o Oráculo..."></textarea>
+        </div>
+        <hr style="border-color:rgba(255,255,255,0.1); margin:15px 0;">
+        <div class="form-group">
+            <label>Seu (Style)</label>
+            <input type="file" id="cssUploadInput" accept=".css,text/plain" style="margin-bottom:5px; font-size:0.8rem;"/>
+            <textarea id="customCssInput" class="glass-textarea" placeholder="Cole CSS aqui..."></textarea>
+            <button class="btn-block" id="btnClearCss" style="margin-top:5px; color:var(--danger)">Remover CSS</button>
+        </div>
+        <button class="btn-block active" id="btnSaveConfig" style="margin-top:15px;">Salvar Tudo</button>
+        <button class="btn-block" style="margin-top:10px; color:var(--danger); border-color:var(--danger)" onclick="if(confirm('Resetar tudo?')) { localStorage.clear(); location.reload(); }">Factory Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="drawerProfile" class="drawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <h3><svg style="width:20px;height:20px;margin-right:8px;stroke:var(--secondary)"><use href="#icon-orb"></use></svg> Cockpit Solar</h3>
+        <button class="btn-icon" style="width:30px;height:30px" onclick="toggleDrawer('drawerProfile')">✕</button>
+      </div>
+      <div class="drawer-body">
+        <div class="cockpit-item" style="text-align:center; margin-bottom:15px;">
+            <div class="cockpit-label">Ciclo Solar</div>
+            <div id="statusSolarMode" style="font-size:1.2rem; font-weight:bold; margin:5px 0;">AUTO</div>
+            <div class="control-row">
+                <button class="btn-block" id="btnCycleSolar">Manual ☀️/🌙</button>
+                <button class="btn-block" id="btnAutoSolar">Auto 🕒</button>
+            </div>
+        </div>
+        <div class="cockpit-grid">
+            <div class="cockpit-item">
+                <div class="cockpit-label">Identificação do Viajante</div>
+                <input type="text" id="inputUserId" class="cockpit-input" placeholder="Anônimo">
+            </div>
+            <div class="cockpit-item">
+                <div class="cockpit-label">Modelo de IA (Engine)</div>
+                <input type="text" id="inputModel" class="cockpit-input" placeholder="google/gemini-2.0-flash-exp">
+            </div>
+            <div class="cockpit-item">
+                <div class="cockpit-label">Background Visual</div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span id="bgStatusText" style="font-size:0.8rem; color:var(--text-muted)">Nenhum</span>
+                    <label class="btn-icon" style="width:30px; height:30px; border-radius:5px;">
+                        <input type="file" id="bgUploadInput" accept="image/*" style="display:none">
+                        <svg><use href="#icon-cards"></use></svg>
+                    </label>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="drawerDeck" class="drawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <h3>Memórias Cristalizadas</h3>
+        <button class="btn-icon" style="width:30px;height:30px" onclick="toggleDrawer('drawerDeck')">✕</button>
+      </div>
+      <div class="drawer-body" id="deckList">
+        <div style="text-align:center; color:var(--text-muted); margin-top:20px">
+           O vazio reina aqui.<br>Use o botão 💎 para salvar.
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  /* =========================================================
+   DUAL.INFODOSE v5.1 — KOBΦ VOICE FIX
+   - Voz: Agora funciona como ON/OFF (Toggle).
+   - Voz: Não envia automático. Apenas transcreve.
+   - Upload: Mantido intacto como memória.
+========================================================= */
+
+const STORAGE = {
+    API_KEY: 'KDX_API_KEY', MODEL: 'KDX_MODEL', 
+    SYSTEM_ROLE: 'KDX_SYSTEM_ROLE', USER_ID: 'KDX_USER_ID', 
+    BG_IMAGE: 'KDX_BG_IMAGE', CUSTOM_CSS: 'KDX_CUSTOM_CSS', 
+    SOLAR_MODE: 'KDX_SOLAR_MODE', SOLAR_AUTO: 'KDX_SOLAR_AUTO'
+};
+
+const FOOTER_TEXTS = {
+    closed: { 
+        ritual: [ "tocar o campo é consentir", "registro aguarda presença", "abrir é escolher ouvir" ], 
+        tecnico: [ "latência detectada", "campo em espera", "aguardando input" ] 
+    },
+    open: { 
+        sustentado: [ "campo ativo", "consciência expandida", "fluxo de dados aberto" ], 
+        estavel: [ "sinal estabilizado", "link neural firme", "processando..." ] 
+    },
+    loading: [ "sincronizando neuro-link...", "buscando no éter...", "decodificando sinal...", "aguarde a fusão..." ]
+};
+
+let lastText = null;
+function getRandomText(arr) { 
+    if (!arr || arr.length === 0) return "Processando...";
+    let t; 
+    do { t = arr[Math.floor(Math.random() * arr.length)]; } while (t === lastText && arr.length > 1); 
+    lastText = t; 
+    return t; 
+}
+
+
+
+/* =========================================================
+   KOBLLUX CORE: NÚCLEO 3-6-9-7 (MÍNIMO)
+   Lógica Fractal de Detecção, Integração e Selagem
+========================================================= */
+const KoblluxCore = {
+    async sha256Hex(s) {
+        const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+        return [...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,'0')).join('');
+    },
+
+    // 3 — DETECTAR (Análise Heurística)
+    classifyText(s) {
+        const t = (s.match(/[\p{L}\p{N}_-]+/gu)||[]);
+        const endsV = ['ar','er','ir']; const verbs=[],nouns=[],adjs=[],others=[];
+        for (const w0 of t){
+            const w = w0.toLowerCase();
+            if (w.endsWith('mente')) { adjs.push(w0); continue; }
+            if (endsV.some(e=>w.endsWith(e))) { verbs.push(w0); continue; }
+            if (w.endsWith('ção')||w.endsWith('são')||w.endsWith('dade')||w.endsWith('logia')) { nouns.push(w0); continue; }
+            if (w.endsWith('ico')||w.endsWith('ica')||w.endsWith('al')||w.endsWith('ual')) { adjs.push(w0); continue; }
+            if (/^[A-ZÁÂÃÀÉÊÍÓÔÕÚÜÇ]/.test(w0)) { nouns.push(w0); continue; }
+            others.push(w0);
+        }
+        return {tokens:t, verbs, nouns, adjs};
+    },
+
+    // 6 — INTEGRAR (Mapa da Trindade)
+    mapTrinity(pos) {
+        return {
+            UNO: pos.nouns[0] || pos.tokens[0] || 'NÚCLEO',
+            DUAL: pos.verbs[0] || 'relaciona',
+            TRINITY: pos.adjs[0] || 'integrado'
+        };
+    },
+
+    // 9 & 7 — EXPANDIR E SELAR (Processamento Final)
+    async process(input) {
+        if(!input) return null;
+        const pos = this.classifyText(input);
+        const tri = this.mapTrinity(pos);
+        const seal = await this.sha256Hex(input + new Date().toISOString()); // Selo Temporal
+        
+        return {
+            raw: input,
+            pos: pos,
+            trinity: tri,
+            seal: seal.slice(0, 16), // Short hash
+            log: `[KOBLLUX ∆7] UNO:${tri.UNO} | DUAL:${tri.DUAL} | TRI:${tri.TRINITY} :: SEAL:${seal.slice(0,8)}`
+        };
+    }
+};
+
+
+/* --- APP CORE --- */
+const App = {
+    state: { 
+        open: false, 
+        messages: [], 
+        isAutoSolar: true, 
+        solarMode: 'night',
+        isProcessing: false,
+        // ESTADO DA VOZ
+        isListening: false,
+        recognition: null 
+    },
+    
+    init() {
+        const s = localStorage;
+        
+        // Carregar Configs
+        document.getElementById('apiKeyInput').value = s.getItem(STORAGE.API_KEY) || '';
+        document.getElementById('systemRoleInput').value = s.getItem(STORAGE.SYSTEM_ROLE) || 'Você é Dual';
+        
+        const savedUser = s.getItem(STORAGE.USER_ID) || 'Viajante';
+        document.getElementById('inputUserId').value = savedUser;
+        document.getElementById('inputModel').value = s.getItem(STORAGE.MODEL) || 'openai/gpt-oss-20b:free';
+
+        // Solar
+        const savedAuto = s.getItem(STORAGE.SOLAR_AUTO);
+        this.state.isAutoSolar = savedAuto === 'false' ? false : true;
+        
+        if (this.state.isAutoSolar) this.autoByTime();
+        else this.setMode(s.getItem(STORAGE.SOLAR_MODE) || 'night');
+
+        // Assets
+        this.indexedDB.loadCustomCSS();
+        this.indexedDB.loadBackground();
+
+        // INICIAR SISTEMA DE VOZ (Carrega o driver, mas não liga)
+        this.setupVoiceSystem();
+
+        // Eventos
+        this.bindEvents();
+        this.updateUI();
+        this.toggleField(false, true); 
+        this.renderDeck();
+        
+        // Saudação
+        setTimeout(() => {
+            const h = new Date().getHours();
+            let greeting = "Bem-vindo de volta";
+            if (h >= 5 && h < 12) greeting = "Bom dia";
+            else if (h >= 12 && h < 18) greeting = "Boa tarde";
+            else greeting = "Boa noite";
+            this.announce(`Dual Infodose Online. ${greeting}, ${savedUser}.`);
+        }, 1200);
+
+        if(typeof particlesJS !== 'undefined') particlesJS('particles-js', {particles:{number:{value:30},color:{value:"#ffffff"},opacity:{value:0.5},size:{value:2},line_linked:{enable:true,distance:150,color:"#ffffff",opacity:0.2,width:1}}});
+    },
+
+    /* --- SISTEMA DE VOZ (CORRIGIDO: TOGGLE & STATE) --- */
+    setupVoiceSystem() {
+        if (!('webkitSpeechRecognition' in window)) {
+            console.warn("Voz não suportada neste navegador.");
+            return;
+        }
+        // Cria a instância UMA VEZ SÓ (Singleton)
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = 'pt-BR';
+        recognition.continuous = true; // Mantém ouvindo mesmo se houver pausas
+        recognition.interimResults = true; // Mostra o texto enquanto você fala
+
+        recognition.onstart = () => {
+            this.state.isListening = true;
+            document.getElementById('btnVoice').classList.add('listening');
+            this.showToast("Canal de voz aberto. Fale...");
+        };
+
+        recognition.onend = () => {
+            this.state.isListening = false;
+            document.getElementById('btnVoice').classList.remove('listening');
+            // Não avisa nada se parou intencionalmente, só desliga o visual
+        };
+
+        recognition.onresult = (event) => {
+            // Pega o texto acumulado
+            let finalTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                } else {
+                    // Texto provisório (opcional, pode ignorar se quiser só o final)
+                    finalTranscript += event.results[i][0].transcript;
+                }
+            }
+            // Joga no Input
+            const input = document.getElementById('userInput');
+            input.value = finalTranscript;
+            // NÃO ENVIA AUTOMATICAMENTE (Send manual)
+        };
+
+        recognition.onerror = (event) => {
+            console.error("Erro voz:", event.error);
+            this.state.isListening = false;
+            document.getElementById('btnVoice').classList.remove('listening');
+            if(event.error === 'no-speech') this.showToast("Nenhum som detectado.");
+        };
+
+        this.state.recognition = recognition;
+    },
+
+    toggleVoice() {
+        if (!this.state.recognition) {
+            alert("Voz não suportada ou não inicializada.");
+            return;
+        }
+
+        if (this.state.isListening) {
+            // Se está ouvindo, PARA
+            this.state.recognition.stop();
+        } else {
+            // Se está parado, INICIA
+            // Limpa o input anterior para nova frase? Ou concatena? Vamos limpar para ser mais limpo.
+            document.getElementById('userInput').value = ''; 
+            try {
+                this.state.recognition.start();
+            } catch (e) {
+                console.error("Erro ao iniciar voz:", e);
+            }
+        }
+    },
+
+    /* --- UPLOAD (MEMÓRIA) --- */
+    setupFileUpload() {
+        const input = document.getElementById('fileUploadInput');
+        const preview = document.getElementById('filePreview');
+        const btn = document.getElementById('btnUploadFile');
+        
+        btn.onclick = () => input.click();
+        
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const info = preview.querySelector('.file-info span');
+            const actions = preview.querySelector('.file-actions');
+            
+            info.textContent = `${file.name} (${(file.size/1024/1024).toFixed(2)} MB)`;
+            preview.classList.add('active');
+            
+            actions.innerHTML = `
+                <button class="btn-preview" onclick="App.cancelUpload()">✕</button>
+                <button class="btn-preview primary" onclick="App.confirmUpload('${file.name}')">Assimilar</button>
+            `;
+        };
+    },
+
+    cancelUpload() {
+        const p = document.getElementById('filePreview');
+        p.classList.remove('active');
+        document.getElementById('fileUploadInput').value = '';
+    },
+
+    async confirmUpload(fileName) {
+    const file = document.getElementById('fileUploadInput').files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = async (e) => { // Nota: adicionei 'async' aqui
+        const content = e.target.result;
+        
+        // PROCESSAMENTO FRACTAL (3-6-9-7)
+        this.announce("Lapidando arquivo na roda 3-6-9...");
+        const fractal = await KoblluxCore.process(content);
+        
+        // Injeção da Memória Lapidada
+        this.addMessage('system', `Memória Fractal Assimilada: ${fileName}\n${fractal.log}`);
+        
+        this.state.messages.push({
+            role: 'user',
+            content: `[ARQUIVO: ${fileName}]\n[ESTRUTURA: ${JSON.stringify(fractal.trinity)}]\n[CONTEÚDO]:\n${content}\n[SELO ∆7: ${fractal.seal}]\n[FIM]`
+        });
+        
+        this.announce("Arquivo selado e integrado.");
+        this.cancelUpload();
+    };
+    
+    // Mantém a lógica de imagem/texto
+    if (file.type.startsWith('image')) {
+        this.addMessage('system', `Imagem detectada: ${fileName}`);
+        this.cancelUpload();
+    } else {
+        reader.readAsText(file);
+    }
+},
+
+    /* --- SISTEMA TTS (FALA DA IA) --- */
+    speakText(text) {
+        if (!text) return;
+        window.speechSynthesis.cancel(); 
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'pt-BR'; 
+        u.rate = 1.1; 
+        window.speechSynthesis.speak(u);
+    },
+
+    announce(text, isError = false) {
+        this.showToast(text, isError);
+    },
+
+    /* --- DECK (CRISTALIZAÇÃO) --- */
+    async crystallizeSession() {
+        if(this.state.messages.length === 0) {
+            this.announce("O vazio não pode ser cristalizado.", true);
+            return;
+        }
+        const title = this.state.messages.find(m => m.role === 'user')?.content || "Memória Sem Nome";
+        const crystal = {
+            id: Date.now(),
+            date: new Date().toLocaleString(),
+            title: title.substring(0, 25) + (title.length>25 ? "..." : ""),
+            data: [...this.state.messages]
+        };
+        await this.indexedDB.saveDeckItem(crystal);
+        this.renderDeck();
+        this.announce("Memória Cristalizada.");
+        const d = document.getElementById('drawerDeck');
+        if(!d.classList.contains('open')) toggleDrawer('drawerDeck');
+    },
+
+    async renderDeck() {
+        const items = await this.indexedDB.getDeck();
+        const container = document.getElementById('deckList');
+        if(!items || items.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:var(--text-muted); margin-top:20px">O vazio reina aqui.<br>Use o botão 💎 para salvar.</div>';
+            return;
+        }
+        container.innerHTML = items.sort((a,b) => b.id - a.id).map(item => `
+            <div class="deck-item">
+                <div class="deck-info">
+                    <h4>${item.title}</h4>
+                    <span>${item.date} • ${item.data.length} msgs</span>
+                </div>
+                <div style="display:flex; gap:10px">
+                    <button class="tool-btn" onclick="App.restoreMemory(${item.id})"><svg><use href="#icon-restore"></use></svg></button>
+                    <button class="tool-btn" style="color:var(--danger)" onclick="App.deleteMemory(${item.id})"><svg><use href="#icon-trash"></use></svg></button>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    async restoreMemory(id) {
+        const items = await this.indexedDB.getDeck();
+        const item = items.find(i => i.id === id);
+        if(item) {
+            document.getElementById('chat-container').innerHTML = '';
+            this.state.messages = [];
+            item.data.forEach(msg => this.addMessage(msg.role === 'assistant' ? 'ai' : 'user', msg.content));
+            toggleDrawer('drawerDeck');
+            this.announce("Memória restaurada.");
+        }
+    },
+
+    async deleteMemory(id) {
+        if(!confirm("Quebrar este cristal?")) return;
+        await this.indexedDB.deleteDeckItem(id);
+        this.renderDeck();
+        this.announce("Fragmentos dispersos.");
+    },
+
+    /* --- CHAT E CÓDIGO --- */
+    async handleSend() {
+  const input = document.getElementById('userInput');
+        const txt = input.value.trim();
+        
+        if (!txt || this.state.isProcessing) return;
+        
+        // --- INÍCIO DA ADIÇÃO (Linha Nova) ---
+        // Lapida a mensagem do usuário antes de enviar visualmente
+        const fractal = await KoblluxCore.process(txt);
+        // Opcional: Console log para você ver o fractal rodando
+        console.log("KOBLLUX CYCLE:", fractal);
+        // --- FIM DA ADIÇÃO ---
+        
+        input.value = '';
+        
+        // Aqui enviamos o texto normal visualmente, mas o sistema sabe do selo
+        this.addMessage('user', txt);
+        this.state.isProcessing = true;
+  
+        const footerHandle = document.getElementById('field-toggle-handle');
+        const loadTxt = getRandomText(FOOTER_TEXTS.loading);
+        footerHandle.innerHTML = `<span class="footer-dot pulse" style="background:var(--primary)"></span> ${loadTxt}`;
+        this.speakText(loadTxt); 
+
+        const key = localStorage.getItem(STORAGE.API_KEY);
+        const model = document.getElementById('inputModel').value;
+
+        if (!key && !model.includes(':free')) {
+            this.announce("Erro: API Key necessária.", true);
+            this.state.isProcessing = false;
+            return;
+        }
+
+        try {
+            document.body.classList.add('loading');
+            if (!this.state.open) this.toggleField(true, true);
+
+            const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${key}`, 
+                    'Content-Type': 'application/json',
+                    'HTTP-Referer': location.origin 
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: [ 
+                        { role: 'system', content: document.getElementById('systemRoleInput').value },
+                        ...this.state.messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
+                        
+                        // ALTERAÇÃO NO ENVIO: Envia o contexto fractal oculto para a IA
+                        { role: 'user', content: `${txt}\n\n[METADADOS KOBLLUX]\nUNO: ${fractal.trinity.UNO}\nSELO: ${fractal.seal}` } 
+                    ]
+                })
+            });
+
+            const data = await res.json();
+            if (data.error) throw new Error(data.error.message || "Erro desconhecido");
+
+            const aiTxt = data.choices?.[0]?.message?.content || "Sem sinal.";
+            this.addMessage('ai', aiTxt);
+
+        } catch (e) {
+            this.announce("Falha na conexão.", true);
+            this.addMessage('system', `Erro: ${e.message}`);
+        } finally {
+            document.body.classList.remove('loading');
+            this.state.isProcessing = false; 
+            this.toggleField(this.state.open, true);
+        }
+    },
+
+    /* --- UI: MENSAGENS E COPY CODE --- */
+    addMessage(role, text) {
+        const c = document.getElementById('chat-container');
+        const d = document.createElement('div');
+        d.className = `msg-block ${role}`;
+        
+        let html = role === 'ai' ? marked.parse(text) : text.replace(/\n/g, '<br>');
+        
+        if(role !== 'system') {
+            html += `<div class="msg-tools">
+                <button class="tool-btn" onclick="Utils.copy(this)"><svg><use href="#icon-copy"></use></svg></button>
+                <button class="tool-btn" onclick="Utils.speak(this)"><svg><use href="#icon-mic"></use></svg></button>
+                ${role === 'user' ? `<button class="tool-btn" onclick="Utils.edit(this)"><svg><use href="#icon-edit"></use></svg></button>` : ''}
+            </div>`;
+            this.state.messages.push({ role: role==='ai'?'assistant':'user', content: text });
+        }
+        
+        d.innerHTML = html;
+        
+        // Injeção de Botões de Código
+        if (role === 'ai') {
+            const codeBlocks = d.querySelectorAll('pre');
+            codeBlocks.forEach(pre => {
+                const btn = document.createElement('button');
+                btn.className = 'copy-code-btn';
+                btn.textContent = 'Copiar Código';
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const code = pre.querySelector('code').innerText;
+                    navigator.clipboard.writeText(code);
+                    btn.textContent = 'Copiado!';
+                    btn.style.color = '#00ff00';
+                    setTimeout(() => { 
+                        btn.textContent = 'Copiar Código'; 
+                        btn.style.color = ''; 
+                    }, 2000);
+                };
+                pre.appendChild(btn);
+            });
+        }
+        
+        c.appendChild(d);
+        c.scrollTop = c.scrollHeight;
+    },
+
+    /* --- LÓGICA SOLAR --- */
+    setMode(mode) {
+        this.state.solarMode = mode;
+        document.body.classList.remove('mode-day', 'mode-sunset', 'mode-night');
+        document.body.classList.add(`mode-${mode}`);
+        localStorage.setItem(STORAGE.SOLAR_MODE, mode);
+        this.updateUI();
+    },
+    
+    cycleSolar() {
+        this.state.isAutoSolar = false;
+        localStorage.setItem(STORAGE.SOLAR_AUTO, 'false');
+        if (this.state.solarMode === 'day') this.setMode('sunset');
+        else if (this.state.solarMode === 'sunset') this.setMode('night');
+        else this.setMode('day');
+        this.announce(`Modo ${this.translateMode(this.state.solarMode)}`);
+    },
+
+    enableAutoSolar() {
+        this.state.isAutoSolar = true;
+        localStorage.setItem(STORAGE.SOLAR_AUTO, 'true');
+        this.autoByTime();
+        this.announce("Sincronização Automática.");
+    },
+
+    autoByTime() {
+        if (!this.state.isAutoSolar) return;
+        const h = new Date().getHours();
+        let m = 'night';
+        if (h >= 6 && h < 17) m = 'day';
+        else if (h >= 17 && h < 19) m = 'sunset';
+        else m = 'night';
+        if (this.state.solarMode !== m) this.setMode(m);
+        else this.updateUI();
+    },
+
+    translateMode(m) {
+        if(m==='day') return 'DIA';
+        if(m==='sunset') return 'OCASO';
+        return 'NOITE';
+    },
+
+    /* --- UI & EVENTOS --- */
+    toggleField(forceState, silent = false) {
+        const isOpen = forceState !== undefined ? forceState : !this.state.open;
+        this.state.open = isOpen;
+        
+        const chat = document.getElementById('chat-container');
+        chat.classList.toggle('collapsed', !isOpen);
+        document.body.classList.toggle('field-closed', !isOpen);
+        
+        if (this.state.isProcessing) return;
+
+        const msgs = this.state.messages.length;
+        const type = isOpen ? (msgs > 5 ? 'estavel' : 'sustentado') : (msgs > 5 ? 'tecnico' : 'ritual');
+        const text = getRandomText(FOOTER_TEXTS[isOpen ? 'open' : 'closed'][type]);
+        
+        const handle = document.getElementById('field-toggle-handle');
+        handle.innerHTML = `<span class="footer-dot"></span> ${text}`;
+        
+        if (!silent) this.speakText(text);
+        if (isOpen) chat.scrollTop = chat.scrollHeight;
+    },
+
+    updateUI() {
+        const m = this.state.solarMode;
+        const auto = this.state.isAutoSolar;
+        const label = document.getElementById('statusSolarMode');
+        const ind = document.getElementById('modeIndicator');
+        const btnAuto = document.getElementById('btnAutoSolar');
+        
+        label.textContent = `${this.translateMode(m)} ${auto ? '(AUTO)' : '(MANUAL)'}`;
+        label.style.color = auto ? 'var(--primary)' : 'orange';
+        ind.textContent = `SISTEMA: ${this.translateMode(m)} // ${auto ? 'SYNC' : 'OVERRIDE'}`;
+        btnAuto.style.opacity = auto ? '1' : '0.5';
+        document.getElementById('usernameDisplay').textContent = document.getElementById('inputUserId').value;
+    },
+
+    bindEvents() {
+        document.getElementById('btnSend').onclick = () => this.handleSend();
+        document.getElementById('userInput').onkeypress = (e) => { if(e.key==='Enter') this.handleSend(); };
+        document.getElementById('field-toggle-handle').onclick = () => this.toggleField(undefined, false);
+        document.getElementById('orbToggle').onclick = () => { toggleDrawer('drawerProfile'); this.speakText("Cockpit Solar"); };
+        document.getElementById('btnCrystallize').onclick = () => this.crystallizeSession();
+        document.getElementById('btnCycleSolar').onclick = () => this.cycleSolar();
+        document.getElementById('btnAutoSolar').onclick = () => { this.enableAutoSolar(); this.updateUI(); };
+        
+        document.getElementById('inputUserId').onchange = (e) => {
+            localStorage.setItem(STORAGE.USER_ID, e.target.value);
+            this.updateUI();
+            this.announce(`Identidade redefinida: ${e.target.value}`);
+        };
+
+        document.getElementById('inputModel').onchange = (e) => {
+            localStorage.setItem(STORAGE.MODEL, e.target.value);
+            this.updateUI();
+            this.showToast("Modelo Atualizado");
+        };
+
+        document.getElementById('btnSaveConfig').onclick = () => {
+            localStorage.setItem(STORAGE.API_KEY, document.getElementById('apiKeyInput').value);
+            localStorage.setItem(STORAGE.SYSTEM_ROLE, document.getElementById('systemRoleInput').value);
+            this.indexedDB.saveCustomCSS(document.getElementById('customCssInput').value);
+            toggleDrawer('drawerSettings');
+            this.announce("Configurações salvas.");
+        };
+
+        document.getElementById('bgUploadInput').onchange = (e) => this.indexedDB.handleBackgroundUpload(e.target.files[0]);
+        document.getElementById('btnSettings').onclick = () => toggleDrawer('drawerSettings');
+        document.getElementById('btnDeck').onclick = () => toggleDrawer('drawerDeck');
+        document.getElementById('btnClearCss').onclick = () => this.indexedDB.clearAsset(STORAGE.CUSTOM_CSS);
+        
+        // VOZ - Agora chama a função de Toggle
+        document.getElementById('btnVoice').onclick = () => this.toggleVoice();
+        
+        this.setupFileUpload();
+    },
+
+    showToast(msg, isError = false) {
+        const t = document.getElementById('nv-toast');
+        t.textContent = msg; 
+        t.style.borderLeft = isError ? '4px solid #ff4444' : '4px solid var(--primary)';
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+        this.speakText(msg);
+    },
+
+    /* --- INDEXEDDB --- */
+    indexedDB: {
+        dbName: "InfodoseDB",
+        async getDB() {
+            return new Promise((res, rej) => {
+                const r = indexedDB.open("InfodoseDB", 2);
+                r.onupgradeneeded = e => {
+                    const db = e.target.result;
+                    if(!db.objectStoreNames.contains('assets')) db.createObjectStore('assets', {keyPath: 'id'});
+                    if(!db.objectStoreNames.contains('deck')) db.createObjectStore('deck', {keyPath: 'id'});
+                };
+                r.onsuccess = e => res(e.target.result);
+                r.onerror = e => rej(e);
+            });
+        },
+        async putAsset(id, data) { const db = await this.getDB(); db.transaction(['assets'],'readwrite').objectStore('assets').put({id, ...data}); },
+        async getAsset(id) { const db = await this.getDB(); return new Promise(r => { const q = db.transaction(['assets'],'readonly').objectStore('assets').get(id); q.onsuccess = () => r(q.result); }); },
+        async clearAsset(id) { 
+            const db = await this.getDB(); db.transaction(['assets'],'readwrite').objectStore('assets').delete(id);
+            if(id === STORAGE.CUSTOM_CSS) { document.getElementById('custom-styles').textContent = ''; document.getElementById('customCssInput').value = ''; }
+            if(id === STORAGE.BG_IMAGE) { document.getElementById('bg-fake-custom').style.backgroundImage = 'none'; document.getElementById('bgStatusText').textContent = 'Nenhum'; }
+        },
+        async handleBackgroundUpload(file) {
+            if(!file) return;
+            await this.putAsset(STORAGE.BG_IMAGE, {blob: file});
+            this.loadBackground();
+        },
+        async loadBackground() {
+            const d = await this.getAsset(STORAGE.BG_IMAGE);
+            if(d && d.blob) {
+                document.getElementById('bg-fake-custom').style.backgroundImage = `url('${URL.createObjectURL(d.blob)}')`;
+                document.getElementById('bgStatusText').textContent = 'Ativo';
+            }
+        },
+        async saveCustomCSS(css) { await this.putAsset(STORAGE.CUSTOM_CSS, {css}); this.loadCustomCSS(); },
+        async loadCustomCSS() { 
+            const d = await this.getAsset(STORAGE.CUSTOM_CSS); 
+            if(d?.css) {
+                document.getElementById('custom-styles').textContent = d.css;
+                document.getElementById('customCssInput').value = d.css;
+            }
+        },
+        async saveDeckItem(item) { const db = await this.getDB(); db.transaction(['deck'],'readwrite').objectStore('deck').put(item); },
+        async getDeck() { const db = await this.getDB(); return new Promise(r => { const q = db.transaction(['deck'],'readonly').objectStore('deck').getAll(); q.onsuccess = () => r(q.result); }); },
+        async deleteDeckItem(id) { const db = await this.getDB(); db.transaction(['deck'],'readwrite').objectStore('deck').delete(id); }
+    }
+};
+
+const Utils = {
+    copy(btn) { navigator.clipboard.writeText(btn.closest('.msg-block').innerText); App.showToast("Copiado para a área de transferência"); },
+    speak(btn) { App.speakText(btn.closest('.msg-block').innerText.replace(/<[^>]*>?/gm, '')); },
+    edit(btn) {
+        const blk = btn.closest('.msg-block'); 
+        const txt = blk.innerText.replace("content_copy", "").trim(); 
+        document.getElementById('userInput').value = txt;
+        blk.remove();
+        App.speakText("Modo edição ativado");
+    }
+};
+
+function toggleDrawer(id) { document.getElementById(id).classList.toggle('open'); }
+window.onload = () => App.init();
+/* Preview & Download Helpers */
+const Preview = {
+    // Detecta tipo de arquivo e gera preview segura
+    async renderPreview(file) {
+        const type = file.type || 'text/plain';
+        const name = file.name || 'arquivo';
+        const url = URL.createObjectURL(file);
+        
+        if (type === 'text/html' || name.endsWith('.html')) {
+            // HTML: sandbox iframe
+            const parser = new DOMParser();
+            const text = await file.text();
+            const sanitized = this.sanitizeHTML(text);
+            const blob = new Blob([sanitized], { type: 'text/html' });
+            const iframeSrc = URL.createObjectURL(blob);
+            return `<div class="preview-html"><iframe src="${iframeSrc}" sandbox="allow-scripts"></iframe></div>`;
+        }
+        
+        if (type.startsWith('image/')) {
+            // Imagem
+            return `<div class="preview-html"><img src="${url}" style="width:100%;height:100%;object-fit:contain;background:#000;"></div>`;
+        }
+
+        // Código/texto plano
+        const text = await file.text();
+        const ext = name.split('.').pop() || 'txt';
+        const lang = this.detectLang(ext);
+        const code = this.escapeHTML(text.slice(0, 2000)); // limita preview
+        const highlighted = `<pre><code class="language-${lang}">${code}</code></pre>`;
+        
+        // Reaplica highlight para novos elementos
+        setTimeout(() => { hljs.highlightAll(); }, 0);
+
+        return `<div class="preview-code">${highlighted}</div>`;
+    },
+
+    sanitizeHTML(html) {
+        // Remove scripts e unsafe tags
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        const scripts = div.querySelectorAll('script');
+        scripts.forEach(s => s.remove());
+        // Permite basic tags: div, span, p, a, img, code, pre, h1-h6, ul, li, table, etc.
+        return div.innerHTML;
+    },
+
+    escapeHTML(str) {
+        return str.replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+    },
+
+    detectLang(ext) {
+        const map = {
+            'js':'javascript','ts':'typescript','css':'css','html':'html','json':'json','md':'markdown',
+            'py':'python','java':'java','c':'c','cpp':'cpp','php':'php','rb':'ruby','go':'go','sh':'bash'
+        };
+        return map[ext.toLowerCase()] || 'text';
+    },
+
+    // Download seguro
+    downloadFile(file, name = file.name) {
+        const url = URL.createObjectURL(file);
+        const a = document.createElement('a');
+        a.href = url; a.download = name; a.click();
+        URL.revokeObjectURL(url);
+    }
+};
+
+/* Extensão da App para usar preview */
+App.handleSend = (async function() {
+    const input = document.getElementById('userInput');
+    const txt = input.value.trim();
+    if (!txt || this.state.isProcessing) return;
+    
+    input.value = '';
+    this.addMessage('user', txt);
+    this.state.isProcessing = true;
+
+    const footerHandle = document.getElementById('field-toggle-handle');
+    const loadTxt = getRandomText(FOOTER_TEXTS.loading);
+    footerHandle.innerHTML = `<span class="footer-dot pulse" style="background:var(--primary)"></span> ${loadTxt}`;
+    this.speakText(loadTxt);
+
+    const key = localStorage.getItem(STORAGE.API_KEY);
+    const model = document.getElementById('inputModel').value;
+
+    if (!key && !model.includes(':free')) {
+        this.announce("Erro: API Key necessária.", true);
+        this.state.isProcessing = false; return;
+    }
+
+    try {
+        document.body.classList.add('loading');
+        if (!this.state.open) this.toggleField(true, true);
+
+        const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json', 'HTTP-Referer': location.origin },
+            body: JSON.stringify({
+                model: model,
+                messages: [
+                    { role: 'system', content: document.getElementById('systemRoleInput').value },
+                    ...this.state.messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
+                    { role: 'user', content: txt }
+                ]
+            })
+        });
+
+        const data = await res.json();
+        if (data.error) throw new Error(data.error.message || "Erro desconhecido");
+        const aiTxt = data.choices?.[0]?.message?.content || "Sem sinal.";
+        this.addMessage('ai', aiTxt);
+
+    } catch (e) {
+        this.announce("Falha na conexão.", true);
+        this.addMessage('system', `Erro: ${e.message}`);
+    } finally {
+        document.body.classList.remove('loading');
+        this.state.isProcessing = false;
+        this.toggleField(this.state.open, true);
+    }
+}).bind(App);
+
+/* Extensão da App para upload com preview */
+App.confirmUpload = (function(fileName) {
+    const file = document.getElementById('fileUploadInput').files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        const preview = await Preview.renderPreview(file);
+        const sizeMB = (file.size/1024/1024).toFixed(2);
+        
+        // Mensagem de arquivo no chat
+        this.addFileMessage(file, preview, sizeMB);
+        
+        // Memória injetada no sistema (texto puro)
+        const content = await file.text();
+        this.state.messages.push({ role: 'user', content: `[ARQUIVO: ${fileName}]\n\n${content}\n\n[FIM]` });
+        this.announce("Arquivo lido e correlacionado.");
+        this.cancelUpload();
+    };
+    reader.onerror = () => this.announce("Erro na leitura da memória.", true);
+    reader.readAsText(file);
+}).bind(App);
+
+/* Nova função: addFileMessage */
+App.addFileMessage = function(file, previewHTML, sizeMB) {
+    const c = document.getElementById('chat-container');
+    const d = document.createElement('div');
+    d.className = 'msg-block file-msg ai';
+    
+    const downloadBtn = `<button class="download-btn" onclick="Preview.downloadFile(${JSON.stringify(file).replace(/"/g, '&quot;')}, '${file.name}')">📥 Baixar ${file.name}</button>`;
+
+    d.innerHTML = `
+        <div class="file-header">
+            <strong>${file.name}</strong>
+            <span class="file-meta">${sizeMB} MB • ${file.type || 'text/plain'}</span>
+        </div>
+        ${previewHTML}
+        <div class="msg-tools">
+            <button class="tool-btn" onclick="Utils.copy(this)"><svg><use href="#icon-copy"></use></svg></button>
+        </div>
+        ${downloadBtn}
+    `;
+    
+    c.appendChild(d);
+    c.scrollTop = c.scrollHeight;
+};
+
+/* Atualização do CSS ao trocar modo (opcional, para tema do highlight) */
+App.setMode = (function(mode) {
+    this.state.solarMode = mode;
+    document.body.classList.remove('mode-day', 'mode-sunset', 'mode-night');
+    document.body.classList.add(`mode-${mode}`);
+    localStorage.setItem(STORAGE.SOLAR_MODE, mode);
+    
+    // Altera tema do highlight.js
+    const theme = mode === 'night' ? 'github-dark' : (mode === 'sunset' ? 'atom-one-dark' : 'github');
+    const link = document.getElementById('hljs-theme');
+    link.href = `https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/styles/${theme}.min.css`;
+    
+    this.updateUI();
+}).bind(App);
+
+/* Atualização do indexedDB para suportar preview (não é necessário mudar estrutura) */
+/* O preview é feito no cliente, não armazenado no DB. */
+
+/* Toast melhorado */
+App.showToast = function(msg, isError = false) {
+    const t = document.getElementById('nv-toast');
+    t.textContent = msg; 
+    t.style.borderLeft = isError ? '4px solid #ff4444' : '4px solid var(--primary)';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+    this.speakText(msg);
+};
+
+/* Atualiza UI após configurações */
+App.updateUI = function() {
+    const m = this.state.solarMode;
+    const auto = this.state.isAutoSolar;
+    const label = document.getElementById('statusSolarMode');
+    const ind = document.getElementById('modeIndicator');
+    const btnAuto = document.getElementById('btnAutoSolar');
+    
+    label.textContent = `${this.translateMode(m)} ${auto ? '(AUTO)' : '(MANUAL)'}`;
+    label.style.color = auto ? 'var(--primary)' : 'orange';
+    ind.textContent = `SISTEMA: ${this.translateMode(m)} // ${auto ? 'SYNC' : 'OVERRIDE'}`;
+    btnAuto.style.opacity = auto ? '1' : '0.5';
+    document.getElementById('usernameDisplay').textContent = document.getElementById('inputUserId').value;
+};
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Dual.Infodose v5.0 · UNLOCKED</title>
+
+  <meta name="theme-color" content="#050811" />
+  <link rel="manifest" href="./manifest.webmanifest">
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  
+  <style>
+    /* =========================
+       SOLAR NEBULA PRO — CORE CSS
+    ========================= */
+    :root {
+      --bg-deep: #050811; 
+      --bg-day: radial-gradient(circle at 30% 20%, #ffffff 0%, #f2f8ff 18%, #d0e9ff 40%, #9ed0ff 65%, #6bb9ff 85%, #59a8ff 100%);
+      --bg-sunset: linear-gradient(180deg, #fbcfe8 0%, #fb923c 20%, #4c1d95 60%, #111827 100%);
+      --bg-night: radial-gradient(circle at 20% 0%, #0b1020 0%, #121c3b 40%, #1a237e 80%, #000000 100%);
+
+      /* UI Tokens */
+      --bg-panel: rgba(10, 14, 24, 0.95);
+      --primary: #00f5ff;
+      --secondary: #ff4bff;
+      --text-main: #e4ecff;
+      --text-muted: #9aa4c8;
+      --danger: #ff4b6b;
+      
+      --glass: blur(20px) saturate(180%);
+      --radius-lg: 24px;
+      --radius-md: 12px;
+    }
+
+    html, body {
+        margin: 0; padding: 0;
+        width: 100%; height: 100%;
+        background-color: var(--bg-deep);
+        background: var(--bg-deep);
+        color: var(--text-main);
+        font-family: "Montserrat", sans-serif;
+        overflow: hidden;
+        transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body.mode-day { background: var(--bg-day) !important; color: #1a1a1a !important; }
+    body.mode-sunset { background: var(--bg-sunset) !important; color: #fff !important; }
+    body.mode-night { background: var(--bg-night) !important; color: var(--text-main) !important; }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    /* Layers */
+    .sky-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .sun-background {
+      position: absolute; width: 300px; height: 300px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fffde7 0%, #fff176 40%, #ffb300 100%);
+      filter: blur(60px); opacity: 0; transition: opacity 2s;
+      animation: sun-orbit 60s linear infinite;
+    }
+    body.mode-day .sun-background { opacity: 0.5; }
+    @keyframes sun-orbit {
+      0% { transform: translate(-20vw, 10vh); }
+      50% { transform: translate(80vw, -10vh); }
+      100% { transform: translate(-20vw, 10vh); }
+    }
+
+    #particles-js { position: fixed; inset: 0; z-index: 1; opacity: 0.3; pointer-events: none; transition: opacity 0.6s ease; }
+    body.mode-day #particles-js { opacity: 0.1; }
+    #bg-fake-custom { position: fixed; inset: 0; z-index: 2; opacity: 0.2; background-size: cover; background-position: center; pointer-events: none; }
+
+    /* UI Elements - ORB */
+    .header-orb {
+      position: fixed; top: 40px; left: 50%; transform: translateX(-50%);
+      width: 70px; height: 70px; z-index: 15;
+      animation: floatOrb 6s ease-in-out infinite;
+      cursor: pointer; transition: all 0.5s ease;
+    }
+    .header-orb svg { width: 100%; height: 100%; transition: fill 0.5s ease; filter: drop-shadow(0 0 10px rgba(0,245,255,0.5)); }
+    body.mode-day .header-orb svg { fill: #fff176; filter: drop-shadow(0 0 20px #ffb300); }
+    body.mode-sunset .header-orb svg { fill: #ffb74d; filter: drop-shadow(0 0 30px #e65100); }
+    body.mode-night .header-orb svg { fill: white; filter: drop-shadow(0 0 15px var(--primary)); }
+    @keyframes floatOrb { 0%,100%{transform:translate(-50%,0)} 50%{transform:translate(-50%,-8px)} }
+    
+    #usernameDisplay {
+        position: fixed; top: 120px; left: 50%; 
+        transform: translateX(-50%); z-index: 10;
+        font-size: 0.75rem; color: var(--text-muted);
+        opacity: 0.6; pointer-events: none;
+        text-transform: uppercase; letter-spacing: 2px;
+    }
+
+    #nv-toast {
+      position: fixed; bottom: 200px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px; border-radius: 50px;
+      backdrop-filter: blur(10px); opacity: 0; transition: 0.4s; z-index: 9999;
+      font-size: 0.8rem; pointer-events: none; border: 1px solid rgba(255,255,255,0.1);
+    }
+    #nv-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #modeIndicator { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); font-size: 0.65rem; font-weight: bold; opacity: 0.5; z-index: 20; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Chat Area */
+    .top-bar { position: fixed; top: 0; left: 0; right: 0; padding: 15px; display: flex; justify-content: space-between; z-index: 20; pointer-events: none; }
+    .top-grp { display: flex; gap: 10px; pointer-events: auto; }
+
+    #chat-container { 
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        padding: 140px 16px 100px 16px; z-index: 5; 
+        overflow-y: auto; display: flex; flex-direction: column; gap: 20px; 
+        transition: opacity 0.4s ease; scroll-behavior: smooth;
+    }
+    #chat-container.collapsed { opacity: 0; pointer-events: none; }
+
+    /* =========================================
+       NEW MESSAGE STRUCTURE (BUBBLES)
+    ========================================= */
+    .message {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        animation: slideIn 0.3s ease-out;
+    }
+    .message.user { align-items: flex-end; }
+    .message.ai { align-items: flex-start; }
+    
+    /* Bubble Style - User */
+    .user-bubble {
+        max-width: 85%;
+        padding: 12px 16px;
+        border-radius: 14px 14px 2px 14px;
+        background: rgba(0,245,255,0.1);
+        border: 1px solid rgba(0,245,255,0.2);
+        color: var(--text-main);
+        font-size: 0.95rem;
+        line-height: 1.5;
+        text-align: right;
+    }
+    body.mode-day .user-bubble { background: rgba(0,0,0,0.05); color: #222; border-color: rgba(0,0,0,0.1); }
+
+    /* Bubble Style - AI (THE RAW RENDERER) */
+    .ai-bubble {
+        max-width: 90%;
+        padding: 16px;
+        border-radius: 14px 14px 14px 2px;
+        background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(0,0,0,0.2));
+        border: 1px solid rgba(255,255,255,0.08);
+        color: var(--text-main);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        overflow-x: auto; /* Para tabelas/código largo */
+    }
+    body.mode-day .ai-bubble { 
+        background: #ffffff; 
+        color: #222; 
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    /* Markdown Elements */
+    .ai-bubble h1, .ai-bubble h2, .ai-bubble h3 { margin-top: 20px; margin-bottom: 10px; font-weight: 700; color: var(--primary); }
+    .ai-bubble p { margin-bottom: 10px; }
+    .ai-bubble ul, .ai-bubble ol { margin-left: 20px; margin-bottom: 10px; }
+    .ai-bubble a { color: var(--primary); text-decoration: none; border-bottom: 1px dashed var(--primary); }
+    
+    .ai-bubble pre { 
+        background: rgba(0,0,0,0.3); 
+        padding: 12px; 
+        border-radius: 10px; 
+        overflow-x: auto; 
+        border: 1px solid rgba(255,255,255,0.1);
+        margin: 15px 0;
+    }
+    body.mode-day .ai-bubble pre { background: #f4f4f4; border: 1px solid #ddd; color: #333; }
+    .ai-bubble code { 
+        font-family: 'JetBrains Mono', monospace; 
+        font-size: 0.85rem; 
+        background: rgba(255,255,255,0.1); 
+        padding: 2px 5px; 
+        border-radius: 4px; 
+    }
+    body.mode-day .ai-bubble code { background: rgba(0,0,0,0.05); }
+
+    .msg-block.system { align-self: center; font-size: 0.75rem; opacity: 0.8; text-align: center; border: 1px dashed rgba(255,255,255,0.2); background: transparent; padding: 6px 12px; font-style: italic; border-radius: 8px; margin: 10px 0; }
+    
+    .copy-code-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--primary); font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; cursor: pointer; z-index: 10; opacity: 0.7; transition: 0.2s; }
+    .copy-code-btn:hover { opacity: 1; background: var(--primary); color: #000; }
+    
+    @keyframes slideIn { from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
+
+    /* Tools & Buttons */
+    .msg-tools { display: flex; gap: 8px; margin-top: 6px; opacity: 0.5; padding-left: 5px; transition: opacity 0.3s; }
+    .message:hover .msg-tools { opacity: 1; }
+    .message.user .msg-tools { justify-content: flex-end; padding-right: 5px; }
+    
+    .tool-btn { background: none; border: none; color: inherit; padding: 4px; cursor: pointer; transition: 0.2s; border-radius: 4px; }
+    .tool-btn:hover { color: var(--primary); background: rgba(255,255,255,0.05); }
+    .tool-btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; display: block; }
+
+    /* Input Dock */
+    .input-dock { position: fixed; bottom: 0; left: 0; right: 0; padding: 16px; background: linear-gradient(to top, var(--bg-deep) 30%, transparent); z-index: 30; display: flex; flex-direction: column; align-items: center; }
+    body.mode-day .input-dock { background: linear-gradient(to top, rgba(255,255,255,0.8) 30%, transparent); }
+
+    #filePreview { display: none; width: 100%; max-width: 400px; background: rgba(0,0,0,0.8); border: 1px solid var(--primary); border-radius: 12px; padding: 10px; margin-bottom: 10px; align-items: center; justify-content: space-between; backdrop-filter: blur(10px); }
+    #filePreview.active { display: flex; animation: slideIn 0.3s; }
+    .file-actions { display: flex; gap: 10px; }
+    .btn-preview { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; }
+    .btn-preview.primary { background: var(--primary); color: #000; }
+
+    #field-toggle-handle { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; opacity: 0.9; cursor: pointer; padding-bottom: 12px; text-transform: lowercase; letter-spacing: 1px; transition: 0.3s; }
+    .footer-dot{ width:8px; height:8px; border-radius:50%; background:var(--secondary); animation:pulse 2s infinite; }
+    @keyframes pulse{50%{opacity:.4; box-shadow: 0 0 10px currentColor;}}
+    
+    .input-row { display: flex; width: 100%; gap: 10px; align-items: center; max-width: 800px; }
+    .glass-input { flex: 1; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); color: inherit; padding: 14px 20px; border-radius: 99px; outline: none; transition: 0.3s; }
+    .glass-input:focus { background: rgba(0,0,0,0.5); border-color: var(--primary); box-shadow: 0 0 15px rgba(0,245,255,0.2); }
+    body.mode-day .glass-input:focus { background: white; }
+
+    .btn-icon { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: inherit; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; backdrop-filter: blur(5px); }
+    .btn-icon:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); border-color: var(--primary); }
+    .btn-icon svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; }
+    .btn-primary { background: var(--primary); color: #000 !important; border: none; box-shadow: 0 0 10px rgba(0, 245, 255, 0.4); }
+    #btnVoice.listening { background: var(--danger); box-shadow: 0 0 15px var(--danger); animation: pulse 1s infinite; color: white !important; }
+
+    /* Drawers */
+    .drawer { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; display: flex; align-items: center; justify-content: center; }
+    .drawer.open { opacity: 1; pointer-events: auto; }
+    .drawer-content { width: 90%; max-width: 450px; max-height: 85vh; background: var(--bg-panel); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    body.mode-day .drawer-content { background: #fff; color: #222; }
+    .drawer.open .drawer-content { transform: scale(1); }
+    .drawer-header { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); }
+    .drawer-body { padding: 20px; overflow-y: auto; flex: 1; }
+
+    .cockpit-grid { display: flex; flex-direction: column; gap: 15px; }
+    .cockpit-item { background: rgba(255,255,255,0.03); padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; }
+    .cockpit-label { font-size: 0.7rem; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+    .cockpit-input { background: transparent; border: none; color: white; font-family: 'JetBrains Mono', monospace; font-size: 1rem; outline: none; width: 100%; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px; transition: 0.3s; }
+    
+    .btn-block { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: inherit; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: 0.2s; }
+    .btn-block:hover { background: rgba(255,255,255,0.15); border-color: var(--primary); }
+
+    .deck-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+    .deck-info h4 { margin: 0 0 5px 0; font-size: 0.9rem; }
+    .deck-info span { font-size: 0.7rem; opacity: 0.7; }
+    .glass-textarea { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2); color: inherit; padding: 10px; border-radius: 8px; min-height: 80px; }
+  </style>
+  <style id="custom-styles"></style>
+</head>
+
+<body class="field-closed mode-day">
+
+  <svg style="display:none">
+    <symbol id="icon-orb" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="8"/></symbol>
+    <symbol id="icon-cards" viewBox="0 0 24 24"><rect x="2" y="2" width="16" height="16" rx="2"/><path d="M22 6v14a2 2 0 0 1-2 2H6"/></symbol>
+    <symbol id="icon-gem" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="icon-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+    <symbol id="icon-voice" viewBox="0 0 24 24"><rect x="9" y="1" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></symbol>
+    <symbol id="icon-mic" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></symbol>
+    <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+    <symbol id="icon-restore" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></symbol>
+    <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-sandbox" viewBox="0 0 24 24"><path d="M14 3h7v7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="7" width="14" height="14" rx="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-pdf" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="7" y="17" font-size="5.5" fill="currentColor" font-family="monospace" font-weight="700">PDF</text></symbol>
+    <symbol id="icon-md" viewBox="0 0 24 24"><path d="M4 19V5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 19V5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 9l5 3 5-3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 12v7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+    
+  <div class="sky-layer"><div class="sun-background"></div></div>
+  <div id="particles-js"></div>
+  <div id="bg-fake-custom"></div> 
+  <div id="nv-toast"></div>
+  <div id="modeIndicator">CARREGANDO nO.Sºlar...</div>
+
+  <div class="header-orb" id="orbToggle" title="Acessar Cockpit do Usuário">
+    <svg><use href="#icon-orb"></use></svg>
+  </div>
+  <div id="usernameDisplay"></div>
+
+  <div class="top-bar">
+    <div class="top-grp">
+      <button class="btn-icon" id="btnSettings" title="Configurações Avançadas">
+        <svg><use href="#icon-settings"></use></svg>
+      </button>
+    </div>
+    <div class="top-grp">
+      <button class="btn-icon" id="btnDeck" title="Deck de Memória">
+        <svg><use href="#icon-cards"></use></svg>
+      </button>
+      <button class="btn-icon" id="btnCrystallize" title="Cristalizar (Salvar)">
+        <svg><use href="#icon-gem"></use></svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="chat-container" class="collapsed">
+    <div class="msg-block system">
+      Dual.Infodose v5.0 · 🔓 God Mode Active<br>HTML RAW: Habilitado. Scripts: Executáveis.
+    </div>
+  </div>
+
+  <div class="input-dock">
+    <div id="filePreview" class="file-preview">
+       <div class="file-info"><span></span></div>
+       <div class="file-actions"></div>
+    </div>
+    <input type="file" id="fileUploadInput" accept="image/*,.pdf,.txt,.json,.js,.css,.html" style="display:none;">
+
+    <div id="field-toggle-handle">
+        <span class="footer-dot"></span>
+        tocar o campo é consentir
+    </div>
+
+    <div class="input-row">
+        <button class="btn-icon" id="btnVoice" title="Voz">
+            <svg><use href="#icon-voice"></use></svg>
+       </button>
+        <button class="btn-icon" id="btnUploadFile" title="Enviar Arquivo">
+            <svg><use href="#icon-upload"></use></svg>
+       </button>
+        <input type="text" id="userInput" class="glass-input" placeholder="Emitir pulso..." autocomplete="off">
+        <button class="btn-icon btn-primary" id="btnSend" title="Enviar">
+          <svg><use href="#icon-send"></use></svg>
+        </button>
+    </div>
+  </div>
+
+  <div id="drawerSettings" class="drawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <h3>Configuração Neural</h3>
+        <button class="btn-icon" style="width:30px;height:30px" onclick="toggleDrawer('drawerSettings')">✕</button>
+      </div>
+      <div class="drawer-body">
+        <div class="form-group">
+          <label>Chave Dual (API Key)</label>
+          <input type="password" id="apiKeyInput" class="glass-input" style="border-radius:8px; width:100%" placeholder="sk-..." />
+        </div>
+        <div class="form-group">
+            <label>Dual (Prompt)</label>
+            <textarea id="systemRoleInput" class="glass-textarea" placeholder="Você é o Oráculo..."></textarea>
+        </div>
+        <hr style="border-color:rgba(255,255,255,0.1); margin:15px 0;">
+        <div class="form-group">
+            <label>Seu (Style)</label>
+            <input type="file" id="cssUploadInput" accept=".css,text/plain" style="margin-bottom:5px; font-size:0.8rem;"/>
+            <textarea id="customCssInput" class="glass-textarea" placeholder="Cole CSS aqui..."></textarea>
+            <button class="btn-block" id="btnClearCss" style="margin-top:5px; color:var(--danger)">Remover CSS</button>
+        </div>
+        <button class="btn-block active" id="btnSaveConfig" style="margin-top:15px;">Salvar Tudo</button>
+        <button class="btn-block" style="margin-top:10px; color:var(--danger); border-color:var(--danger)" onclick="if(confirm('Resetar tudo?')) { localStorage.clear(); location.reload(); }">Factory Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="drawerProfile" class="drawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <h3><svg style="width:20px;height:20px;margin-right:8px;stroke:var(--secondary)"><use href="#icon-orb"></use></svg> Cockpit Solar</h3>
+        <button class="btn-icon" style="width:30px;height:30px" onclick="toggleDrawer('drawerProfile')">✕</button>
+      </div>
+      <div class="drawer-body">
+        <div class="cockpit-item" style="text-align:center; margin-bottom:15px;">
+            <div class="cockpit-label">Ciclo Solar</div>
+            <div id="statusSolarMode" style="font-size:1.2rem; font-weight:bold; margin:5px 0;">AUTO</div>
+            <div class="control-row">
+                <button class="btn-block" id="btnCycleSolar">Manual ☀️/🌙</button>
+                <button class="btn-block" id="btnAutoSolar">Auto 🕒</button>
+            </div>
+        </div>
+        <div class="cockpit-grid">
+            <div class="cockpit-item">
+                <div class="cockpit-label">Identificação do Viajante</div>
+                <input type="text" id="inputUserId" class="cockpit-input" placeholder="Anônimo">
+            </div>
+            <div class="cockpit-item">
+                <div class="cockpit-label">Modelo de IA (Engine)</div>
+                <input type="text" id="inputModel" class="cockpit-input" placeholder="google/gemini-2.0-flash-exp">
+            </div>
+            <div class="cockpit-item">
+                <div class="cockpit-label">Background Visual</div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span id="bgStatusText" style="font-size:0.8rem; color:var(--text-muted)">Nenhum</span>
+                    <label class="btn-icon" style="width:30px; height:30px; border-radius:5px;">
+                        <input type="file" id="bgUploadInput" accept="image/*" style="display:none">
+                        <svg><use href="#icon-cards"></use></svg>
+                    </label>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="drawerDeck" class="drawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <h3>Memórias Cristalizadas</h3>
+        <button class="btn-icon" style="width:30px;height:30px" onclick="toggleDrawer('drawerDeck')">✕</button>
+      </div>
+      <div class="drawer-body" id="deckList">
+        <div style="text-align:center; color:var(--text-muted); margin-top:20px">
+           O vazio reina aqui.<br>Use o botão 💎 para salvar.
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* =========================================================
+   DUAL.INFODOSE v5.1 — UNLOCKED HTML RENDERER
+========================================================= */
+
+// 1. Configurar Marked para GFM (GitHub Flavored Markdown)
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+  headerIds: false,
+  mangle: false
+});
+
+const STORAGE = {
+    API_KEY: 'KDX_API_KEY', MODEL: 'KDX_MODEL', 
+    SYSTEM_ROLE: 'KDX_SYSTEM_ROLE', USER_ID: 'KDX_USER_ID', 
+    BG_IMAGE: 'KDX_BG_IMAGE', CUSTOM_CSS: 'KDX_CUSTOM_CSS', 
+    SOLAR_MODE: 'KDX_SOLAR_MODE', SOLAR_AUTO: 'KDX_SOLAR_AUTO'
+};
+
+const FOOTER_TEXTS = {
+    closed: { 
+        ritual: [ "tocar o campo é consentir", "registro aguarda presença", "abrir é escolher ouvir" ], 
+        tecnico: [ "latência detectada", "campo em espera", "aguardando input" ] 
+    },
+    open: { 
+        sustentado: [ "campo ativo", "consciência expandida", "fluxo de dados aberto" ], 
+        estavel: [ "sinal estabilizado", "link neural firme", "processando..." ] 
+    },
+    loading: [ "sincronizando neuro-link...", "buscando no éter...", "decodificando sinal...", "aguarde a fusão..." ]
+};
+
+let lastText = null;
+function getRandomText(arr) { 
+    if (!arr || arr.length === 0) return "Processando...";
+    let t; 
+    do { t = arr[Math.floor(Math.random() * arr.length)]; } while (t === lastText && arr.length > 1); 
+    lastText = t; 
+    return t; 
+}
+
+/* --- APP CORE --- */
+const App = {
+    state: { 
+        open: false, 
+        messages: [], 
+        isAutoSolar: true, 
+        solarMode: 'night',
+        isProcessing: false,
+        isListening: false,
+        recognition: null 
+    },
+    
+    init() {
+        const s = localStorage;
+        document.getElementById('apiKeyInput').value = s.getItem(STORAGE.API_KEY) || '';
+        document.getElementById('systemRoleInput').value = s.getItem(STORAGE.SYSTEM_ROLE) || 'Você é Dual';
+        
+        const savedUser = s.getItem(STORAGE.USER_ID) || 'Viajante';
+        document.getElementById('inputUserId').value = savedUser;
+        document.getElementById('inputModel').value = s.getItem(STORAGE.MODEL) || 'openai/gpt-oss-20b:free';
+
+        const savedAuto = s.getItem(STORAGE.SOLAR_AUTO);
+        this.state.isAutoSolar = savedAuto === 'false' ? false : true;
+        
+        if (this.state.isAutoSolar) this.autoByTime();
+        else this.setMode(s.getItem(STORAGE.SOLAR_MODE) || 'night');
+
+        this.indexedDB.loadCustomCSS();
+        this.indexedDB.loadBackground();
+        this.setupVoiceSystem();
+        this.bindEvents();
+        this.updateUI();
+        this.toggleField(false, true); 
+        this.renderDeck();
+        
+        setTimeout(() => {
+            const h = new Date().getHours();
+            let greeting = "Bem-vindo de volta";
+            if (h >= 5 && h < 12) greeting = "Bom dia";
+            else if (h >= 12 && h < 18) greeting = "Boa tarde";
+            else greeting = "Boa noite";
+            this.announce(`Dual Infodose Online. ${greeting}, ${savedUser}.`);
+        }, 1200);
+
+        if(typeof particlesJS !== 'undefined') particlesJS('particles-js', {particles:{number:{value:30},color:{value:"#ffffff"},opacity:{value:0.5},size:{value:2},line_linked:{enable:true,distance:150,color:"#ffffff",opacity:0.2,width:1}}});
+    },
+
+    setupVoiceSystem() {
+        if (!('webkitSpeechRecognition' in window)) {
+            console.warn("Voz não suportada neste navegador.");
+            return;
+        }
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = 'pt-BR';
+        recognition.continuous = true; 
+        recognition.interimResults = true;
+
+        recognition.onstart = () => {
+            this.state.isListening = true;
+            document.getElementById('btnVoice').classList.add('listening');
+            this.showToast("Canal de voz aberto. Fale...");
+        };
+        recognition.onend = () => {
+            this.state.isListening = false;
+            document.getElementById('btnVoice').classList.remove('listening');
+        };
+        recognition.onresult = (event) => {
+            let finalTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
+                else finalTranscript += event.results[i][0].transcript;
+            }
+            document.getElementById('userInput').value = finalTranscript;
+        };
+        recognition.onerror = (event) => {
+            console.error("Erro voz:", event.error);
+            this.state.isListening = false;
+            document.getElementById('btnVoice').classList.remove('listening');
+            if(event.error === 'no-speech') this.showToast("Nenhum som detectado.");
+        };
+        this.state.recognition = recognition;
+    },
+
+    toggleVoice() {
+        if (!this.state.recognition) {
+            alert("Voz não suportada ou não inicializada.");
+            return;
+        }
+        if (this.state.isListening) this.state.recognition.stop();
+        else {
+            document.getElementById('userInput').value = ''; 
+            try { this.state.recognition.start(); } catch (e) { console.error("Erro ao iniciar voz:", e); }
+        }
+    },
+
+    setupFileUpload() {
+        const input = document.getElementById('fileUploadInput');
+        const preview = document.getElementById('filePreview');
+        const btn = document.getElementById('btnUploadFile');
+        btn.onclick = () => input.click();
+        
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const info = preview.querySelector('.file-info span');
+            const actions = preview.querySelector('.file-actions');
+            info.textContent = `${file.name} (${(file.size/1024/1024).toFixed(2)} MB)`;
+            preview.classList.add('active');
+            actions.innerHTML = `
+                <button class="btn-preview" onclick="App.cancelUpload()">✕</button>
+                <button class="btn-preview primary" onclick="App.confirmUpload('${file.name}')">Assimilar</button>
+            `;
+        };
+    },
+
+    cancelUpload() {
+        const p = document.getElementById('filePreview');
+        p.classList.remove('active');
+        document.getElementById('fileUploadInput').value = '';
+    },
+
+    confirmUpload(fileName) {
+        const file = document.getElementById('fileUploadInput').files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const content = e.target.result;
+            this.addMessage('system', `Memória assimilada: ${fileName}`);
+            this.state.messages.push({
+                role: 'user', 
+                content: `[SISTEMA DE ARQUIVO: ${fileName}]\n\n${content}\n\n[FIM DO ARQUIVO]`
+            });
+            this.announce("Arquivo lido e correlacionado.");
+            this.cancelUpload();
+        };
+        if (file.type.startsWith('image')) {
+             this.addMessage('system', `Imagem detectada (metadados): ${fileName}`);
+             this.cancelUpload();
+        } else {
+            reader.readAsText(file);
+        }
+    },
+
+    speakText(text) {
+        if (!text) return;
+        window.speechSynthesis.cancel(); 
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'pt-BR'; u.rate = 1.1; 
+        window.speechSynthesis.speak(u);
+    },
+    announce(text, isError = false) { this.showToast(text, isError); },
+
+    async crystallizeSession() {
+        if(this.state.messages.length === 0) {
+            this.announce("O vazio não pode ser cristalizado.", true);
+            return;
+        }
+        const title = this.state.messages.find(m => m.role === 'user')?.content || "Memória Sem Nome";
+        const crystal = {
+            id: Date.now(),
+            date: new Date().toLocaleString(),
+            title: title.substring(0, 25) + (title.length>25 ? "..." : ""),
+            data: [...this.state.messages]
+        };
+        await this.indexedDB.saveDeckItem(crystal);
+        this.renderDeck();
+        this.announce("Memória Cristalizada.");
+        const d = document.getElementById('drawerDeck');
+        if(!d.classList.contains('open')) toggleDrawer('drawerDeck');
+    },
+
+    async renderDeck() {
+        const items = await this.indexedDB.getDeck();
+        const container = document.getElementById('deckList');
+        if(!items || items.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:var(--text-muted); margin-top:20px">O vazio reina aqui.<br>Use o botão 💎 para salvar.</div>';
+            return;
+        }
+        container.innerHTML = items.sort((a,b) => b.id - a.id).map(item => `
+            <div class="deck-item">
+                <div class="deck-info">
+                    <h4>${item.title}</h4>
+                    <span>${item.date} • ${item.data.length} msgs</span>
+                </div>
+                <div style="display:flex; gap:10px">
+                    <button class="tool-btn" onclick="App.restoreMemory(${item.id})"><svg><use href="#icon-restore"></use></svg></button>
+                    <button class="tool-btn" style="color:var(--danger)" onclick="App.deleteMemory(${item.id})"><svg><use href="#icon-trash"></use></svg></button>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    async restoreMemory(id) {
+        const items = await this.indexedDB.getDeck();
+        const item = items.find(i => i.id === id);
+        if(item) {
+            document.getElementById('chat-container').innerHTML = '';
+            this.state.messages = [];
+            item.data.forEach(msg => this.addMessage(msg.role === 'assistant' ? 'ai' : 'user', msg.content));
+            toggleDrawer('drawerDeck');
+            this.announce("Memória restaurada.");
+        }
+    },
+
+    async deleteMemory(id) {
+        if(!confirm("Quebrar este cristal?")) return;
+        await this.indexedDB.deleteDeckItem(id);
+        this.renderDeck();
+        this.announce("Fragmentos dispersos.");
+    },
+
+    async handleSend() {
+        const input = document.getElementById('userInput');
+        const txt = input.value.trim();
+        if (!txt || this.state.isProcessing) return;
+        
+        input.value = '';
+        this.addMessage('user', txt);
+        this.state.isProcessing = true;
+        
+        const footerHandle = document.getElementById('field-toggle-handle');
+        const loadTxt = getRandomText(FOOTER_TEXTS.loading);
+        footerHandle.innerHTML = `<span class="footer-dot pulse" style="background:var(--primary)"></span> ${loadTxt}`;
+        this.speakText(loadTxt); 
+
+        const key = localStorage.getItem(STORAGE.API_KEY);
+        const model = document.getElementById('inputModel').value;
+
+        if (!key && !model.includes(':free')) {
+            this.announce("Erro: API Key necessária.", true);
+            this.state.isProcessing = false;
+            return;
+        }
+
+        try {
+            document.body.classList.add('loading');
+            if (!this.state.open) this.toggleField(true, true);
+
+            const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${key}`, 
+                    'Content-Type': 'application/json',
+                    'HTTP-Referer': location.origin 
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: [ 
+                        { role: 'system', content: document.getElementById('systemRoleInput').value },
+                        ...this.state.messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
+                        { role: 'user', content: txt } 
+                    ]
+                })
+            });
+
+            const data = await res.json();
+            if (data.error) throw new Error(data.error.message || "Erro desconhecido");
+
+            const aiTxt = data.choices?.[0]?.message?.content || "Sem sinal.";
+            this.addMessage('ai', aiTxt);
+
+        } catch (e) {
+            this.announce("Falha na conexão.", true);
+            this.addMessage('system', `Erro: ${e.message}`);
+        } finally {
+            document.body.classList.remove('loading');
+            this.state.isProcessing = false; 
+            this.toggleField(this.state.open, true);
+        }
+    },
+
+    // --- RENDERIZADOR SUPREMO (RAW HTML + SCRIPTS) ---
+    addMessage(role, text) {
+        const c = document.getElementById('chat-container');
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${role}`; // ex: message ai, message user
+        
+        // Salva o raw para downloads
+        msgDiv.dataset.raw = text || '';
+
+        // Se for sistema, renderiza simples
+        if (role === 'system') {
+             msgDiv.className = 'msg-block system';
+             msgDiv.innerHTML = text;
+             c.appendChild(msgDiv);
+             return;
+        }
+
+        // --- Renderização do Conteúdo ---
+        let contentHtml = '';
+        if (role === 'ai') {
+            // IA: Usa Marked (Markdown) -> vira HTML
+            contentHtml = marked.parse(text); 
+        } else {
+            // User: Apenas quebras de linha
+            contentHtml = text.replace(/\n/g, '<br>');
+        }
+
+        // Monta o Bubble
+        const bubble = document.createElement('div');
+        bubble.className = role === 'ai' ? 'ai-bubble' : 'user-bubble';
+        bubble.innerHTML = contentHtml; // INSERÇÃO PURA (XSS ALLOWED)
+
+        msgDiv.appendChild(bubble);
+
+        // --- Botões de Ferramentas (Abaixo do Bubble) ---
+        const toolsDiv = document.createElement('div');
+        toolsDiv.className = 'msg-tools';
+        
+        let toolsHtml = `
+            <button class="tool-btn" onclick="Utils.copy(this)" title="Copiar"><svg><use href="#icon-copy"></use></svg></button>
+            <button class="tool-btn" onclick="Utils.speak(this)" title="Ouvir"><svg><use href="#icon-mic"></use></svg></button>
+        `;
+        
+        if (role === 'user') {
+            toolsHtml += `<button class="tool-btn" onclick="Utils.edit(this)" title="Editar"><svg><use href="#icon-edit"></use></svg></button>`;
+        } else if (role === 'ai') {
+            // Ferramentas avançadas para IA
+            toolsHtml += `
+              <button class="tool-btn" onclick="DownloadUtils.downloadMessage(this)" title="Download HTML/TXT"><svg><use href="#icon-download"></use></svg></button>
+              <button class="tool-btn" onclick="DownloadUtils.openSandbox(this)" title="Abrir Sandbox"><svg><use href="#icon-sandbox"></use></svg></button>
+              <button class="tool-btn" onclick="DownloadUtils.exportPdf(this)" title="PDF"><svg><use href="#icon-pdf"></use></svg></button>
+              <button class="tool-btn" onclick="DownloadUtils.downloadMarkdown(this)" title="MD"><svg><use href="#icon-md"></use></svg></button>
+            `;
+        }
+        toolsDiv.innerHTML = toolsHtml;
+        msgDiv.appendChild(toolsDiv);
+
+        // --- Adiciona botões de cópia em blocos de código ---
+        if (role === 'ai') {
+            const codeBlocks = bubble.querySelectorAll('pre');
+            codeBlocks.forEach(pre => {
+                const btn = document.createElement('button');
+                btn.className = 'copy-code-btn';
+                btn.textContent = 'Copiar';
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const code = pre.querySelector('code')?.innerText || pre.innerText;
+                    navigator.clipboard.writeText(code);
+                    btn.textContent = 'Copiado!';
+                    setTimeout(() => { btn.textContent = 'Copiar'; }, 2000);
+                };
+                pre.appendChild(btn);
+            });
+        }
+
+        // Adiciona ao DOM
+        this.state.messages.push({ role: role==='ai'?'assistant':'user', content: text });
+        c.appendChild(msgDiv);
+        c.scrollTop = c.scrollHeight;
+
+        // --- PULO DO GATO: Executa Scripts Inseridos ---
+        if (role === 'ai') {
+            this.runScripts(bubble);
+        }
+    },
+
+    // Função Manual de Execução de Scripts (God Mode)
+    runScripts(element) {
+        const scripts = element.querySelectorAll('script');
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement('script');
+            // Copia atributos (src, type, etc)
+            Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+            // Copia o conteúdo interno
+            newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+            // Substitui o script morto pelo vivo
+            oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
+    },
+
+    setMode(mode) {
+        this.state.solarMode = mode;
+        document.body.classList.remove('mode-day', 'mode-sunset', 'mode-night');
+        document.body.classList.add(`mode-${mode}`);
+        localStorage.setItem(STORAGE.SOLAR_MODE, mode);
+        this.updateUI();
+    },
+    
+    cycleSolar() {
+        this.state.isAutoSolar = false;
+        localStorage.setItem(STORAGE.SOLAR_AUTO, 'false');
+        if (this.state.solarMode === 'day') this.setMode('sunset');
+        else if (this.state.solarMode === 'sunset') this.setMode('night');
+        else this.setMode('day');
+        this.announce(`Modo ${this.translateMode(this.state.solarMode)}`);
+    },
+
+    enableAutoSolar() {
+        this.state.isAutoSolar = true;
+        localStorage.setItem(STORAGE.SOLAR_AUTO, 'true');
+        this.autoByTime();
+        this.announce("Sincronização Automática.");
+    },
+
+    autoByTime() {
+        if (!this.state.isAutoSolar) return;
+        const h = new Date().getHours();
+        let m = 'night';
+        if (h >= 6 && h < 17) m = 'day';
+        else if (h >= 17 && h < 19) m = 'sunset';
+        else m = 'night';
+        if (this.state.solarMode !== m) this.setMode(m);
+        else this.updateUI();
+    },
+
+    translateMode(m) {
+        if(m==='day') return 'DIA';
+        if(m==='sunset') return 'OCASO';
+        return 'NOITE';
+    },
+
+    toggleField(forceState, silent = false) {
+        const isOpen = forceState !== undefined ? forceState : !this.state.open;
+        this.state.open = isOpen;
+        
+        const chat = document.getElementById('chat-container');
+        chat.classList.toggle('collapsed', !isOpen);
+        document.body.classList.toggle('field-closed', !isOpen);
+        
+        if (this.state.isProcessing) return;
+
+        const msgs = this.state.messages.length;
+        const type = isOpen ? (msgs > 5 ? 'estavel' : 'sustentado') : (msgs > 5 ? 'tecnico' : 'ritual');
+        const text = getRandomText(FOOTER_TEXTS[isOpen ? 'open' : 'closed'][type]);
+        
+        const handle = document.getElementById('field-toggle-handle');
+        handle.innerHTML = `<span class="footer-dot"></span> ${text}`;
+        
+        if (!silent) this.speakText(text);
+        if (isOpen) chat.scrollTop = chat.scrollHeight;
+    },
+
+    updateUI() {
+        const m = this.state.solarMode;
+        const auto = this.state.isAutoSolar;
+        const label = document.getElementById('statusSolarMode');
+        const ind = document.getElementById('modeIndicator');
+        const btnAuto = document.getElementById('btnAutoSolar');
+        
+        label.textContent = `${this.translateMode(m)} ${auto ? '(AUTO)' : '(MANUAL)'}`;
+        label.style.color = auto ? 'var(--primary)' : 'orange';
+        ind.textContent = `SISTEMA: ${this.translateMode(m)} // ${auto ? 'SYNC' : 'OVERRIDE'}`;
+        btnAuto.style.opacity = auto ? '1' : '0.5';
+        document.getElementById('usernameDisplay').textContent = document.getElementById('inputUserId').value;
+    },
+
+    bindEvents() {
+        document.getElementById('btnSend').onclick = () => this.handleSend();
+        document.getElementById('userInput').onkeypress = (e) => { if(e.key==='Enter') this.handleSend(); };
+        document.getElementById('field-toggle-handle').onclick = () => this.toggleField(undefined, false);
+        document.getElementById('orbToggle').onclick = () => { toggleDrawer('drawerProfile'); this.speakText("Cockpit Solar"); };
+        document.getElementById('btnCrystallize').onclick = () => this.crystallizeSession();
+        document.getElementById('btnCycleSolar').onclick = () => this.cycleSolar();
+        document.getElementById('btnAutoSolar').onclick = () => { this.enableAutoSolar(); this.updateUI(); };
+        
+        document.getElementById('inputUserId').onchange = (e) => {
+            localStorage.setItem(STORAGE.USER_ID, e.target.value);
+            this.updateUI();
+            this.announce(`Identidade redefinida: ${e.target.value}`);
+        };
+
+        document.getElementById('inputModel').onchange = (e) => {
+            localStorage.setItem(STORAGE.MODEL, e.target.value);
+            this.updateUI();
+            this.showToast("Modelo Atualizado");
+        };
+
+        document.getElementById('btnSaveConfig').onclick = () => {
+            localStorage.setItem(STORAGE.API_KEY, document.getElementById('apiKeyInput').value);
+            localStorage.setItem(STORAGE.SYSTEM_ROLE, document.getElementById('systemRoleInput').value);
+            this.indexedDB.saveCustomCSS(document.getElementById('customCssInput').value);
+            toggleDrawer('drawerSettings');
+            this.announce("Configurações salvas.");
+        };
+
+        document.getElementById('bgUploadInput').onchange = (e) => this.indexedDB.handleBackgroundUpload(e.target.files[0]);
+        document.getElementById('btnSettings').onclick = () => toggleDrawer('drawerSettings');
+        document.getElementById('btnDeck').onclick = () => toggleDrawer('drawerDeck');
+        document.getElementById('btnClearCss').onclick = () => this.indexedDB.clearAsset(STORAGE.CUSTOM_CSS);
+        document.getElementById('btnVoice').onclick = () => this.toggleVoice();
+        
+        this.setupFileUpload();
+    },
+
+    showToast(msg, isError = false) {
+        const t = document.getElementById('nv-toast');
+        t.textContent = msg; 
+        t.style.borderLeft = isError ? '4px solid #ff4444' : '4px solid var(--primary)';
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+        this.speakText(msg);
+    },
+
+    indexedDB: {
+        dbName: "InfodoseDB",
+        async getDB() {
+            return new Promise((res, rej) => {
+                const r = indexedDB.open("InfodoseDB", 2);
+                r.onupgradeneeded = e => {
+                    const db = e.target.result;
+                    if(!db.objectStoreNames.contains('assets')) db.createObjectStore('assets', {keyPath: 'id'});
+                    if(!db.objectStoreNames.contains('deck')) db.createObjectStore('deck', {keyPath: 'id'});
+                };
+                r.onsuccess = e => res(e.target.result);
+                r.onerror = e => rej(e);
+            });
+        },
+        async putAsset(id, data) { const db = await this.getDB(); db.transaction(['assets'],'readwrite').objectStore('assets').put({id, ...data}); },
+        async getAsset(id) { const db = await this.getDB(); return new Promise(r => { const q = db.transaction(['assets'],'readonly').objectStore('assets').get(id); q.onsuccess = () => r(q.result); }); },
+        async clearAsset(id) { 
+            const db = await this.getDB(); db.transaction(['assets'],'readwrite').objectStore('assets').delete(id);
+            if(id === STORAGE.CUSTOM_CSS) { document.getElementById('custom-styles').textContent = ''; document.getElementById('customCssInput').value = ''; }
+            if(id === STORAGE.BG_IMAGE) { document.getElementById('bg-fake-custom').style.backgroundImage = 'none'; document.getElementById('bgStatusText').textContent = 'Nenhum'; }
+        },
+        async handleBackgroundUpload(file) {
+            if(!file) return;
+            await this.putAsset(STORAGE.BG_IMAGE, {blob: file});
+            this.loadBackground();
+        },
+        async loadBackground() {
+            const d = await this.getAsset(STORAGE.BG_IMAGE);
+            if(d && d.blob) {
+                document.getElementById('bg-fake-custom').style.backgroundImage = `url('${URL.createObjectURL(d.blob)}')`;
+                document.getElementById('bgStatusText').textContent = 'Ativo';
+            }
+        },
+        async saveCustomCSS(css) { await this.putAsset(STORAGE.CUSTOM_CSS, {css}); this.loadCustomCSS(); },
+        async loadCustomCSS() { 
+            const d = await this.getAsset(STORAGE.CUSTOM_CSS); 
+            if(d?.css) {
+                document.getElementById('custom-styles').textContent = d.css;
+                document.getElementById('customCssInput').value = d.css;
+            }
+        },
+        async saveDeckItem(item) { const db = await this.getDB(); db.transaction(['deck'],'readwrite').objectStore('deck').put(item); },
+        async getDeck() { const db = await this.getDB(); return new Promise(r => { const q = db.transaction(['deck'],'readonly').objectStore('deck').getAll(); q.onsuccess = () => r(q.result); }); },
+        async deleteDeckItem(id) { const db = await this.getDB(); db.transaction(['deck'],'readwrite').objectStore('deck').delete(id); }
+    }
+};
+
+const Utils = {
+    copy(btn) { navigator.clipboard.writeText(btn.closest('.message').innerText); App.showToast("Copiado"); },
+    speak(btn) { App.speakText(btn.closest('.message').innerText.replace(/<[^>]*>?/gm, '')); },
+    edit(btn) {
+        const blk = btn.closest('.message'); 
+        const txt = blk.dataset.raw || blk.innerText; 
+        document.getElementById('userInput').value = txt;
+        blk.remove();
+        App.speakText("Modo edição ativado");
+    }
+};
+
+const DownloadUtils = {
+  _getBlock(btn) { return btn.closest('.message'); },
+
+  _getCleanHtml(block) {
+    const bubble = block.querySelector('.ai-bubble'); // Pega só o bubble
+    return bubble ? bubble.innerHTML : block.innerHTML;
+  },
+
+  _guessFilename(base, extFallback='txt') {
+    const t = new Date().toISOString().replace(/[:.]/g,'-');
+    if (!base) return `ai-output-${t}.${extFallback}`;
+    if (/<\s*!doctype|<html|<body|<head/i.test(base)) return `ai-output-${t}.html`;
+    return `ai-output-${t}.${extFallback}`;
+  },
+
+  downloadMessage(btn) {
+    try {
+      const block = this._getBlock(btn);
+      if(!block) return;
+      const content = this._getCleanHtml(block);
+      const isHTML = /<\s*!doctype|<html|<body|<head|<\/div>/i.test(content);
+      const mime = isHTML ? 'text/html' : 'text/plain';
+      const ext = isHTML ? 'html' : 'txt';
+      const filename = this._guessFilename(content, ext);
+      const blob = new Blob([content], { type: mime + ';charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      App.showToast(`Download iniciado: ${filename}`);
+    } catch (e) {
+      console.error(e);
+      App.showToast('Erro ao gerar download', true);
+    }
+  },
+
+  downloadMarkdown(btn) {
+    try {
+      const block = this._getBlock(btn);
+      if(!block) return;
+      const raw = block.dataset.raw || block.innerText || '';
+      const filename = this._guessFilename(raw, 'md').replace(/\.(html|txt)$/, '.md');
+      const blob = new Blob([raw], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      App.showToast(`Markdown salvo: ${filename}`);
+    } catch (e) {
+      console.error(e);
+      App.showToast('Erro ao salvar .md', true);
+    }
+  },
+
+  openSandbox(btn) {
+    try {
+      const block = this._getBlock(btn);
+      if(!block) return;
+      const content = this._getCleanHtml(block);
+      let page = content;
+      if(!/<\s*!doctype|<html/i.test(content)) {
+        page = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sandbox - AI Output</title></head><body>${content}</body></html>`;
+      }
+      const blob = new Blob([page], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      App.showToast('Sandbox aberto em nova aba');
+    } catch (e) {
+      console.error(e);
+      App.showToast('Erro ao abrir sandbox', true);
+    }
+  },
+
+  async exportPdf(btn) {
+    try {
+      if(typeof html2pdf === 'undefined') {
+        App.showToast('Biblioteca PDF indisponível. Abrindo sandbox...', true);
+        return this.openSandbox(btn);
+      }
+      const block = this._getBlock(btn);
+      if(!block) return;
+      const content = this._getCleanHtml(block);
+
+      const container = document.createElement('div');
+      container.style.position = 'fixed'; container.style.left = '-9999px'; container.style.top = '0';
+      container.style.width = '1100px'; container.style.padding = '20px'; container.style.background = '#ffffff';
+      container.innerHTML = content;
+      document.body.appendChild(container);
+
+      const orientation = (container.scrollWidth > container.scrollHeight) ? 'landscape' : 'portrait';
+      const filename = this._guessFilename(content, 'pdf').replace(/\.(html|txt)$/, '.pdf');
+
+      await html2pdf().from(container).set({
+        margin: [12, 12, 12, 12],
+        filename: filename,
+        html2canvas: { scale: 3, useCORS: true, logging: false },
+        jsPDF: { unit: 'pt', format: 'a4', orientation: orientation }
+      }).save();
+
+      document.body.removeChild(container);
+      App.showToast(`PDF gerado: ${filename}`);
+    } catch (e) {
+      console.error(e);
+      App.showToast('Falha ao gerar PDF. Abrindo sandbox...', true);
+      this.openSandbox(btn);
+    }
+  }
+};
+
+function toggleDrawer(id) { document.getElementById(id).classList.toggle('open'); }
+window.onload = () => App.init();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+</body>
+</html>
