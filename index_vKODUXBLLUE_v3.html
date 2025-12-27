@@ -1116,18 +1116,5 @@ window.onload = () => App.init();
 })();
 </script>
 
-
-<!-- PATCH C: pré-carrega html2pdf (opcional) -->
-<script id="patch-preload-html2pdf">
-  (function(){
-    if(window.html2pdf) return;
-    const s=document.createElement('script');
-    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js';
-    s.defer = true;
-    document.head.appendChild(s);
-    s.onload = () => console.info('html2pdf carregado (pré-load)');
-  })();
-</script>
-
 </body>
 </html>
