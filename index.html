@@ -3,18 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <title>Dual.Infodose v5.0 · UNLOCKED</title>
+  <title>Dual.Infodose v5.0 · KOBLLUX INTEGRATED</title>
 
   <meta name="theme-color" content="#050811" />
-  <link rel="./manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="manifest" href="./manifest.json">
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js')
-        .then(() => console.log('Service Worker Registered'));
-    }
-  </script>
+
+<link rel="apple-touch-icon" href="./icon-192.png">
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('Service Worker Registered'));
+  }
+</script>
+
+
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -57,6 +61,13 @@
     body.mode-sunset { background: var(--bg-sunset) !important; color: #fff !important; }
     body.mode-night { background: var(--bg-night) !important; color: var(--text-main) !important; }
 
+    /* Adaptação UI */
+    body.mode-day .msg-block.ai { background: rgba(0,0,0,0.05); color: #222; border-color: rgba(0,0,0,0.1); }
+    body.mode-day .glass-input { background: rgba(255,255,255,0.8); color: #000; border-color: #ccc; }
+    body.mode-day .btn-icon { color: #333; border-color: rgba(0,0,0,0.2); }
+    body.mode-day .cockpit-item { background: rgba(0,0,0,0.05); color: #000; }
+    body.mode-day .cockpit-input { color: #000; border-bottom-color: rgba(0,0,0,0.3); }
+    
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     /* Layers */
@@ -64,7 +75,7 @@
     .sun-background {
       position: absolute; width: 300px; height: 300px; border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #fffde7 0%, #fff176 40%, #ffb300 100%);
-      filter: blur(60px); opacity: 0; transition: opacity 2s;
+      filter: blur(60px); opacity: 0; transition: opacity 0.6s ease;
       animation: sun-orbit 60s linear infinite;
     }
     body.mode-day .sun-background { opacity: 0.5; }
@@ -76,19 +87,23 @@
 
     #particles-js { position: fixed; inset: 0; z-index: 1; opacity: 0.3; pointer-events: none; transition: opacity 0.6s ease; }
     body.mode-day #particles-js { opacity: 0.1; }
-    #bg-fake-custom { position: fixed; inset: 0; z-index: 2; opacity: 0.2; background-size: cover; background-position: center; pointer-events: none; }
+    #bg-fake-custom { position: fixed; inset: 0; z-index: 2; opacity: 0.2; background-size: cover; background-position: center; pointer-events: none; transition: opacity 0.6s ease; }
 
-    /* UI Elements - ORB */
-    .header-orb {
+    /* UI Elements */
+    /* ---------- ORB DO TOPO (PRONTO) ---------- */
+
+.header-orb {
       position: fixed; top: 40px; left: 50%; transform: translateX(-50%);
       width: 70px; height: 70px; z-index: 15;
       animation: floatOrb 6s ease-in-out infinite;
       cursor: pointer; transition: all 0.5s ease;
     }
     .header-orb svg { width: 100%; height: 100%; transition: fill 0.5s ease; filter: drop-shadow(0 0 10px rgba(0,245,255,0.5)); }
+
     body.mode-day .header-orb svg { fill: #fff176; filter: drop-shadow(0 0 20px #ffb300); }
     body.mode-sunset .header-orb svg { fill: #ffb74d; filter: drop-shadow(0 0 30px #e65100); }
     body.mode-night .header-orb svg { fill: white; filter: drop-shadow(0 0 15px var(--primary)); }
+
     @keyframes floatOrb { 0%,100%{transform:translate(-50%,0)} 50%{transform:translate(-50%,-8px)} }
     
     #usernameDisplay {
@@ -115,95 +130,28 @@
     #chat-container { 
         position: absolute; top: 0; left: 0; right: 0; bottom: 0;
         padding: 140px 16px 100px 16px; z-index: 5; 
-        overflow-y: auto; display: flex; flex-direction: column; gap: 20px; 
+        overflow-y: auto; display: flex; flex-direction: column; gap: 16px; 
         transition: opacity 0.4s ease; scroll-behavior: smooth;
     }
     #chat-container.collapsed { opacity: 0; pointer-events: none; }
 
-    /* =========================================
-       NEW MESSAGE STRUCTURE (BUBBLES)
-    ========================================= */
-    .message {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        animation: slideIn 0.3s ease-out;
-    }
-    .message.user { align-items: flex-end; }
-    .message.ai { align-items: flex-start; }
+    .msg-block { max-width: 88%; padding: 12px 16px; border-radius: 12px; position: relative; animation: slideIn 0.3s ease-out; line-height: 1.5; font-size: 0.95rem; word-wrap: break-word; }
+    .msg-block.user { align-self: flex-end; background: rgba(0,245,255,0.08); border-right: 2px solid var(--primary); text-align: right; }
+    .msg-block.ai { align-self: flex-start; background: rgba(255,255,255,0.05); border-left: 2px solid var(--secondary); }
+    .msg-block.system { align-self: center; font-size: 0.75rem; opacity: 0.8; text-align: center; border: 1px dashed rgba(255,255,255,0.2); background: transparent; padding: 6px 12px; font-style: italic; }
     
-    /* Bubble Style - User */
-    .user-bubble {
-        max-width: 85%;
-        padding: 12px 16px;
-        border-radius: 14px 14px 2px 14px;
-        background: rgba(0,245,255,0.1);
-        border: 1px solid rgba(0,245,255,0.2);
-        color: var(--text-main);
-        font-size: 0.95rem;
-        line-height: 1.5;
-        text-align: right;
-    }
-    body.mode-day .user-bubble { background: rgba(0,0,0,0.05); color: #222; border-color: rgba(0,0,0,0.1); }
-
-    /* Bubble Style - AI (THE RAW RENDERER) */
-    .ai-bubble {
-        max-width: 90%;
-        padding: 16px;
-        border-radius: 14px 14px 14px 2px;
-        background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(0,0,0,0.2));
-        border: 1px solid rgba(255,255,255,0.08);
-        color: var(--text-main);
-        font-size: 0.95rem;
-        line-height: 1.6;
-        overflow-x: auto; /* Para tabelas/código largo */
-    }
-    body.mode-day .ai-bubble { 
-        background: #ffffff; 
-        color: #222; 
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
-        border: 1px solid rgba(0,0,0,0.05);
-    }
-
-    /* Markdown Elements */
-    .ai-bubble h1, .ai-bubble h2, .ai-bubble h3 { margin-top: 20px; margin-bottom: 10px; font-weight: 700; color: var(--primary); }
-    .ai-bubble p { margin-bottom: 10px; }
-    .ai-bubble ul, .ai-bubble ol { margin-left: 20px; margin-bottom: 10px; }
-    .ai-bubble a { color: var(--primary); text-decoration: none; border-bottom: 1px dashed var(--primary); }
-    
-    .ai-bubble pre { 
-        background: rgba(0,0,0,0.3); 
-        padding: 12px; 
-        border-radius: 10px; 
-        overflow-x: auto; 
-        border: 1px solid rgba(255,255,255,0.1);
-        margin: 15px 0;
-    }
-    body.mode-day .ai-bubble pre { background: #f4f4f4; border: 1px solid #ddd; color: #333; }
-    .ai-bubble code { 
-        font-family: 'JetBrains Mono', monospace; 
-        font-size: 0.85rem; 
-        background: rgba(255,255,255,0.1); 
-        padding: 2px 5px; 
-        border-radius: 4px; 
-    }
-    body.mode-day .ai-bubble code { background: rgba(0,0,0,0.05); }
-
-    .msg-block.system { align-self: center; font-size: 0.75rem; opacity: 0.8; text-align: center; border: 1px dashed rgba(255,255,255,0.2); background: transparent; padding: 6px 12px; font-style: italic; border-radius: 8px; margin: 10px 0; }
-    
+    pre { position: relative; background: rgba(0,0,0,0.4); border-radius: 8px; margin: 10px 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+    code { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
     .copy-code-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--primary); font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; cursor: pointer; z-index: 10; opacity: 0.7; transition: 0.2s; }
     .copy-code-btn:hover { opacity: 1; background: var(--primary); color: #000; }
-    
     @keyframes slideIn { from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
 
     /* Tools & Buttons */
-    .msg-tools { display: flex; gap: 8px; margin-top: 6px; opacity: 0.5; padding-left: 5px; transition: opacity 0.3s; }
-    .message:hover .msg-tools { opacity: 1; }
-    .message.user .msg-tools { justify-content: flex-end; padding-right: 5px; }
-    
-    .tool-btn { background: none; border: none; color: inherit; padding: 4px; cursor: pointer; transition: 0.2s; border-radius: 4px; }
-    .tool-btn:hover { color: var(--primary); background: rgba(255,255,255,0.05); }
-    .tool-btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; display: block; }
+    .msg-tools { display: flex; gap: 10px; justify-content: flex-end; margin-top: 5px; opacity: 0.6; }
+    .msg-block.ai .msg-tools { justify-content: flex-start; }
+    .tool-btn { background: none; border: none; color: inherit; padding: 0; cursor: pointer; transition: 0.2s; }
+    .tool-btn:hover { color: var(--primary); opacity: 1; transform: scale(1.1); }
+    .tool-btn svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; display: block; }
 
     /* Input Dock */
     .input-dock { position: fixed; bottom: 0; left: 0; right: 0; padding: 16px; background: linear-gradient(to top, var(--bg-deep) 30%, transparent); z-index: 30; display: flex; flex-direction: column; align-items: center; }
@@ -255,7 +203,7 @@
   <style id="custom-styles"></style>
 </head>
 
-<body class="field-closed mode-day">
+<body class="field-closed">
 
   <svg style="display:none">
     <symbol id="icon-orb" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="8"/></symbol>
@@ -264,16 +212,36 @@
     <symbol id="icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
     <symbol id="icon-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
     <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
-    <symbol id="icon-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>< /symbol>
     <symbol id="icon-voice" viewBox="0 0 24 24"><rect x="9" y="1" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></symbol>
     <symbol id="icon-mic" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></symbol>
     <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
     <symbol id="icon-restore" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></symbol>
     <symbol id="icon-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></symbol>
-    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="icon-sandbox" viewBox="0 0 24 24"><path d="M14 3h7v7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="7" width="14" height="14" rx="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="icon-pdf" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="7" y="17" font-size="5.5" fill="currentColor" font-family="monospace" font-weight="700">PDF</text></symbol>
-    <symbol id="icon-md" viewBox="0 0 24 24"><path d="M4 19V5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 19V5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 9l5 3 5-3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 12v7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    
+    <symbol id="icon-download" viewBox="0 0 24 24">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <symbol id="icon-sandbox" viewBox="0 0 24 24">
+      <path d="M14 3h7v7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="3" y="7" width="14" height="14" rx="2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <symbol id="icon-pdf" viewBox="0 0 24 24">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="7" y="17" font-size="5.5" fill="currentColor" font-family="monospace" font-weight="700">PDF</text>
+    </symbol>
+
+    <symbol id="icon-md" viewBox="0 0 24 24">
+      <path d="M4 19V5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M9 19V5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M4 9l5 3 5-3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M14 12v7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
   </svg>
     
   <div class="sky-layer"><div class="sun-background"></div></div>
@@ -305,7 +273,7 @@
 
   <div id="chat-container" class="collapsed">
     <div class="msg-block system">
-      Dual.Infodose v5.0 · 🔓 God Mode Active<br>HTML RAW: Habilitado. Scripts: Executáveis.
+      Dual.Infodose v5.0<br>Sistemas re-alinhados.<br>Exportação Avançada Pronta.
     </div>
   </div>
 
@@ -418,16 +386,9 @@
 
 <script>
 /* =========================================================
-   DUAL.INFODOSE v5.1 — UNLOCKED HTML RENDERER
+   DUAL.INFODOSE v5.1 — KOBΦ VOICE FIX + ADVANCED DOWNLOADS
+   Atualizado: sincronização de tema automático corrigida
 ========================================================= */
-
-// 1. Configurar Marked para GFM (GitHub Flavored Markdown)
-marked.setOptions({
-  gfm: true,
-  breaks: true,
-  headerIds: false,
-  mangle: false
-});
 
 const STORAGE = {
     API_KEY: 'KDX_API_KEY', MODEL: 'KDX_MODEL', 
@@ -463,7 +424,7 @@ const App = {
         open: false, 
         messages: [], 
         isAutoSolar: true, 
-        solarMode: 'night',
+        solarMode: null, // <-- inicializado como null para forçar sync inicial
         isProcessing: false,
         isListening: false,
         recognition: null 
@@ -481,6 +442,9 @@ const App = {
         const savedAuto = s.getItem(STORAGE.SOLAR_AUTO);
         this.state.isAutoSolar = savedAuto === 'false' ? false : true;
         
+        // remove qualquer classe de modo pré-injetada (evita mismatch visual no boot)
+        document.body.classList.remove('mode-day','mode-sunset','mode-night');
+
         if (this.state.isAutoSolar) this.autoByTime();
         else this.setMode(s.getItem(STORAGE.SOLAR_MODE) || 'night');
 
@@ -578,48 +542,23 @@ const App = {
         document.getElementById('fileUploadInput').value = '';
     },
 
-    // --- PATCH 1: Assimilação REAL de arquivos (estilo Blue) ---
     confirmUpload(fileName) {
         const file = document.getElementById('fileUploadInput').files[0];
-        if (!file) return;
-
+        if(!file) return;
         const reader = new FileReader();
-
         reader.onload = (e) => {
             const content = e.target.result;
-
-            this.addMessage(
-                'system',
-                `📎 Arquivo carregado: ${fileName}\nTipo: ${file.type || 'desconhecido'}`
-            );
-
+            this.addMessage('system', `Memória assimilada: ${fileName}`);
             this.state.messages.push({
-                role: 'system',
-                content:
-`ARQUIVO CONTEXTUALIZADO
-Nome: ${fileName}
-Tipo: ${file.type || 'desconhecido'}
-Tamanho: ${(file.size / 1024).toFixed(1)} KB
-
-CONTEÚDO:
-${content}
-
-INSTRUÇÃO:
-Use este arquivo como referência estrutural e semântica.
-Não repetir o conteúdo integral nas respostas,
-a menos que o usuário solicite explicitamente.`
+                role: 'user', 
+                content: `[SISTEMA DE ARQUIVO: ${fileName}]\n\n${content}\n\n[FIM DO ARQUIVO]`
             });
-
-            this.announce("Arquivo assimilado ao contexto.");
+            this.announce("Arquivo lido e correlacionado.");
             this.cancelUpload();
         };
-
         if (file.type.startsWith('image')) {
-            this.addMessage(
-                'system',
-                `🖼️ Imagem detectada: ${fileName}\n(Imagens não são lidas como texto)`
-            );
-            this.cancelUpload();
+             this.addMessage('system', `Imagem detectada (metadados): ${fileName}`);
+             this.cancelUpload();
         } else {
             reader.readAsText(file);
         }
@@ -753,104 +692,52 @@ a menos que o usuário solicite explicitamente.`
         }
     },
 
-    // --- RENDERIZADOR SUPREMO (RAW HTML + SCRIPTS) ---
+    // --- NOVA FUNÇÃO ADDMESSAGE (com suporte a dataset.raw e ícones SVG)
     addMessage(role, text) {
         const c = document.getElementById('chat-container');
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `message ${role}`; // ex: message ai, message user
+        const d = document.createElement('div');
+        d.className = `msg-block ${role}`;
+        d.dataset.raw = text || '';
+
+        let html = role === 'ai' ? marked.parse(text) : text.replace(/\n/g, '<br>');
         
-        // Salva o raw para downloads
-        msgDiv.dataset.raw = text || '';
-
-        // Se for sistema, renderiza simples
-        if (role === 'system') {
-             msgDiv.className = 'msg-block system';
-             msgDiv.innerHTML = text;
-             c.appendChild(msgDiv);
-             return;
+        if(role !== 'system') {
+            html += `<div class="msg-tools">
+                <button class="tool-btn" onclick="Utils.copy(this)" title="Copiar"><svg><use href="#icon-copy"></use></svg></button>
+                <button class="tool-btn" onclick="Utils.speak(this)" title="Ouvir"><svg><use href="#icon-mic"></use></svg></button>
+                ${role === 'user' ? `<button class="tool-btn" onclick="Utils.edit(this)" title="Editar"><svg><use href="#icon-edit"></use></svg></button>` : ''}
+                ${role === 'ai' ? `
+                  <button class="tool-btn" onclick="DownloadUtils.downloadMessage(this)" title="Download bruto"><svg><use href="#icon-download"></use></svg></button>
+                  <button class="tool-btn" onclick="DownloadUtils.openSandbox(this)" title="Abrir sandbox"><svg><use href="#icon-sandbox"></use></svg></button>
+                  <button class="tool-btn" onclick="DownloadUtils.exportPdf(this)" title="Exportar PDF"><svg><use href="#icon-pdf"></use></svg></button>
+                  <button class="tool-btn" onclick="DownloadUtils.downloadMarkdown(this)" title="Salvar como .md"><svg><use href="#icon-md"></use></svg></button>
+                ` : ''}
+            </div>`;
+            this.state.messages.push({ role: role==='ai'?'assistant':'user', content: text });
         }
-
-        // --- Renderização do Conteúdo ---
-        let contentHtml = '';
+        
+        d.innerHTML = html;
+        
         if (role === 'ai') {
-            // IA: Usa Marked (Markdown) -> vira HTML
-            contentHtml = marked.parse(text); 
-        } else {
-            // User: Apenas quebras de linha
-            contentHtml = text.replace(/\n/g, '<br>');
-        }
-
-        // Monta o Bubble
-        const bubble = document.createElement('div');
-        bubble.className = role === 'ai' ? 'ai-bubble' : 'user-bubble';
-        bubble.innerHTML = contentHtml; // INSERÇÃO PURA (XSS ALLOWED)
-
-        msgDiv.appendChild(bubble);
-
-        // --- Botões de Ferramentas (Abaixo do Bubble) ---
-        const toolsDiv = document.createElement('div');
-        toolsDiv.className = 'msg-tools';
-        
-        let toolsHtml = `
-            <button class="tool-btn" onclick="Utils.copy(this)" title="Copiar"><svg><use href="#icon-copy"></use></svg></button>
-            <button class="tool-btn" onclick="Utils.speak(this)" title="Ouvir"><svg><use href="#icon-mic"></use></svg></button>
-        `;
-        
-        if (role === 'user') {
-            toolsHtml += `<button class="tool-btn" onclick="Utils.edit(this)" title="Editar"><svg><use href="#icon-edit"></use></svg></button>`;
-        } else if (role === 'ai') {
-            // Ferramentas avançadas para IA
-            toolsHtml += `
-              <button class="tool-btn" onclick="DownloadUtils.downloadMessage(this)" title="Download HTML/TXT"><svg><use href="#icon-download"></use></svg></button>
-              <button class="tool-btn" onclick="DownloadUtils.openSandbox(this)" title="Abrir Sandbox"><svg><use href="#icon-sandbox"></use></svg></button>
-              <button class="tool-btn" onclick="DownloadUtils.exportPdf(this)" title="PDF"><svg><use href="#icon-pdf"></use></svg></button>
-              <button class="tool-btn" onclick="DownloadUtils.downloadMarkdown(this)" title="MD"><svg><use href="#icon-md"></use></svg></button>
-            `;
-        }
-        toolsDiv.innerHTML = toolsHtml;
-        msgDiv.appendChild(toolsDiv);
-
-        // --- Adiciona botões de cópia em blocos de código ---
-        if (role === 'ai') {
-            const codeBlocks = bubble.querySelectorAll('pre');
+            const codeBlocks = d.querySelectorAll('pre');
             codeBlocks.forEach(pre => {
                 const btn = document.createElement('button');
                 btn.className = 'copy-code-btn';
-                btn.textContent = 'Copiar';
+                btn.textContent = 'Copiar Código';
                 btn.onclick = (e) => {
                     e.stopPropagation();
-                    const code = pre.querySelector('code')?.innerText || pre.innerText;
+                    const code = pre.querySelector('code').innerText;
                     navigator.clipboard.writeText(code);
                     btn.textContent = 'Copiado!';
-                    setTimeout(() => { btn.textContent = 'Copiar'; }, 2000);
+                    btn.style.color = '#00ff00';
+                    setTimeout(() => { btn.textContent = 'Copiar Código'; btn.style.color = ''; }, 2000);
                 };
                 pre.appendChild(btn);
             });
         }
-
-        // Adiciona ao DOM
-        this.state.messages.push({ role: role==='ai'?'assistant':'user', content: text });
-        c.appendChild(msgDiv);
+        
+        c.appendChild(d);
         c.scrollTop = c.scrollHeight;
-
-        // --- PULO DO GATO: Executa Scripts Inseridos ---
-        if (role === 'ai') {
-            this.runScripts(bubble);
-        }
-    },
-
-    // Função Manual de Execução de Scripts (God Mode)
-    runScripts(element) {
-        const scripts = element.querySelectorAll('script');
-        scripts.forEach(oldScript => {
-            const newScript = document.createElement('script');
-            // Copia atributos (src, type, etc)
-            Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-            // Copia o conteúdo interno
-            newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-            // Substitui o script morto pelo vivo
-            oldScript.parentNode.replaceChild(newScript, oldScript);
-        });
     },
 
     setMode(mode) {
@@ -858,7 +745,29 @@ a menos que o usuário solicite explicitamente.`
         document.body.classList.remove('mode-day', 'mode-sunset', 'mode-night');
         document.body.classList.add(`mode-${mode}`);
         localStorage.setItem(STORAGE.SOLAR_MODE, mode);
+        // sincroniza camadas visuais (sol, partículas, background)
+        this.syncVisuals(mode);
         this.updateUI();
+    },
+
+    // centraliza ajustes visuais para evitar duplicação
+    syncVisuals(mode) {
+        const sun = document.querySelector('.sun-background');
+        const particles = document.getElementById('particles-js');
+        const bg = document.getElementById('bg-fake-custom');
+        if (sun) {
+            if (mode === 'day') sun.style.opacity = '0.5';
+            else if (mode === 'sunset') sun.style.opacity = '0.4';
+            else sun.style.opacity = '0';
+        }
+        if (particles) {
+            if (mode === 'day') particles.style.opacity = '0.1';
+            else particles.style.opacity = '0.3';
+        }
+        if (bg) {
+            if (mode === 'day') bg.style.opacity = '0.15';
+            else bg.style.opacity = '0.2';
+        }
     },
     
     cycleSolar() {
@@ -884,8 +793,9 @@ a menos que o usuário solicite explicitamente.`
         if (h >= 6 && h < 17) m = 'day';
         else if (h >= 17 && h < 19) m = 'sunset';
         else m = 'night';
-        if (this.state.solarMode !== m) this.setMode(m);
-        else this.updateUI();
+
+        // sempre aplica o modo (corrige mismatch entre state e classe do body)
+        this.setMode(m);
     },
 
     translateMode(m) {
@@ -1024,29 +934,33 @@ a menos que o usuário solicite explicitamente.`
 };
 
 const Utils = {
-    copy(btn) { navigator.clipboard.writeText(btn.closest('.message').innerText); App.showToast("Copiado"); },
-    speak(btn) { App.speakText(btn.closest('.message').innerText.replace(/<[^>]*>?/gm, '')); },
+    copy(btn) { navigator.clipboard.writeText(btn.closest('.msg-block').innerText); App.showToast("Copiado para a área de transferência"); },
+    speak(btn) { App.speakText(btn.closest('.msg-block').innerText.replace(/<[^>]*>?/gm, '')); },
     edit(btn) {
-        const blk = btn.closest('.message'); 
-        const txt = blk.dataset.raw || blk.innerText; 
+        const blk = btn.closest('.msg-block'); 
+        const txt = blk.innerText.replace("content_copy", "").trim(); 
         document.getElementById('userInput').value = txt;
         blk.remove();
         App.speakText("Modo edição ativado");
     }
 };
 
+// --- DOWNLOAD UTILS ATUALIZADO (SVG + PDF SCALE + MARKDOWN) ---
 const DownloadUtils = {
-  _getBlock(btn) { return btn.closest('.message'); },
+  _getBlock(btn) { return btn.closest('.msg-block'); },
 
   _getCleanHtml(block) {
-    const bubble = block.querySelector('.ai-bubble'); // Pega só o bubble
-    return bubble ? bubble.innerHTML : block.innerHTML;
+    const clone = block.cloneNode(true);
+    const tools = clone.querySelector('.msg-tools');
+    if (tools) tools.remove();
+    return clone.innerHTML;
   },
 
   _guessFilename(base, extFallback='txt') {
     const t = new Date().toISOString().replace(/[:.]/g,'-');
     if (!base) return `ai-output-${t}.${extFallback}`;
     if (/<\s*!doctype|<html|<body|<head/i.test(base)) return `ai-output-${t}.html`;
+    if (/<pre|<code/i.test(base)) return `ai-code-${t}.${extFallback}`;
     return `ai-output-${t}.${extFallback}`;
   },
 
@@ -1072,15 +986,11 @@ const DownloadUtils = {
     }
   },
 
-  // --- PATCH 3: Markdown Limpo (trim + safe) ---
   downloadMarkdown(btn) {
     try {
       const block = this._getBlock(btn);
       if(!block) return;
-      
-      // Aplicado o trim para evitar espaços fantasmas
-      const raw = block.dataset.raw?.trim() || block.innerText.trim();
-      
+      const raw = block.dataset.raw || block.innerText || '';
       const filename = this._guessFilename(raw, 'md').replace(/\.(html|txt)$/, '.md');
       const blob = new Blob([raw], { type: 'text/markdown;charset=utf-8' });
       const url = URL.createObjectURL(blob);
@@ -1128,14 +1038,6 @@ const DownloadUtils = {
       container.style.position = 'fixed'; container.style.left = '-9999px'; container.style.top = '0';
       container.style.width = '1100px'; container.style.padding = '20px'; container.style.background = '#ffffff';
       container.innerHTML = content;
-      
-      // --- PATCH 2: PDF Layout Fix ---
-      container.querySelectorAll('pre, code').forEach(el => {
-        el.style.whiteSpace = 'pre-wrap';
-        el.style.wordBreak = 'break-word';
-        el.style.fontSize = '11px';
-      });
-      
       document.body.appendChild(container);
 
       const orientation = (container.scrollWidth > container.scrollHeight) ? 'landscape' : 'portrait';
